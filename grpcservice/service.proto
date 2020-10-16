@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package grpcservice;
+
+// Teamsacs Grpc Services
+service TeamsacsService {
+  // fetch config
+  rpc GetConfig (GetConfigRequest) returns (GetConfigReply) {}
+}
+
+
+// Request for configuration information
+message GetConfigRequest{
+  string type = 1;
+  string name = 2;
+}
+
+
+// Get configuration information response
+message GetConfigReply{
+  int32 code = 1;
+  string message = 2;
+  string value = 3;
+}

@@ -1,0 +1,8 @@
+.idea
+__pycache__
+.vscode
+/resources/*.xlsx
+/release/
+release
+/common/static/static.go
+/common/resources/resources.go
