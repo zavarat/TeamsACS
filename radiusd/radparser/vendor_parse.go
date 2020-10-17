@@ -1,4 +1,4 @@
-package radiusd
+package radparser
 
 import (
 	"fmt"
@@ -10,9 +10,18 @@ import (
 	"layeh.com/radius/rfc2865"
 	"layeh.com/radius/rfc2869"
 
+	"github.com/ca17/teamsacs/radiusd"
+	"github.com/ca17/teamsacs/radiusd/radlog"
 	"github.com/ca17/teamsacs/radiusd/vendors/h3c"
 	"github.com/ca17/teamsacs/radiusd/vendors/radback"
 )
+
+type VendorRequest struct {
+	Macaddr string
+	Vlanid1 int64
+	Vlanid2 int64
+}
+
 
 var (
 	vlanStdRegexp1 = regexp.MustCompile(`\w?\s?\d+/\d+/\d+:(\d+)(\.(\d+))?\s?`)
@@ -38,13 +47,13 @@ func ParseVlanIds(nasportid string) (int64, int64) {
 }
 
 // 解析厂商私有属性
-func (s *RadiusService) ParseVendor(r *radius.Request, vendorCode string) *VendorRequest {
+func  ParseVendor(r *radius.Request, vendorCode string) *VendorRequest {
 	switch vendorCode {
-	case VendorH3c:
+	case radiusd.VendorH3c:
 		return parseVendorH3c(r)
-	case VendorRadback:
+	case radiusd.VendorRadback:
 		return parseVendorRadback(r)
-	case VendorZte:
+	case radiusd.VendorZte:
 		return parseVendorZte(r)
 	default:
 		return parseVendorDefault(r)

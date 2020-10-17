@@ -9,6 +9,7 @@ import (
 	"layeh.com/radius/rfc2866"
 
 	"github.com/ca17/teamsacs/models"
+	"github.com/ca17/teamsacs/radiusd/radlog"
 )
 
 func (s *AcctService) DoAcctNasOn(r *radius.Request) {

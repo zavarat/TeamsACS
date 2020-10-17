@@ -16,30 +16,24 @@ import (
 	"github.com/ca17/teamsacs/common/mfa"
 	"github.com/ca17/teamsacs/common/timeutil"
 	"github.com/ca17/teamsacs/constant"
-	"github.com/ca17/teamsacs/radiusd/vendors/microsoft"
 	"github.com/ca17/teamsacs/models"
+	"github.com/ca17/teamsacs/radiusd/radparser"
+	"github.com/ca17/teamsacs/radiusd/vendors/microsoft"
 )
 
 type LdapRadisProfile struct {
+	AuthorizationProfile
 	Status          string
+	MacAddr         string
 	MfaSecret       string
 	MfaStatus       string
-	Domain          string
-	AddrPool        string
-	MacAddr         string
-	IpAddr          string
 	ActiveNum       int
-	LimitPolicy     string
-	UpLimitPolicy   string
-	DownLimitPolicy string
-	UpRate          int
-	DownRate        int
-	ExpireTime      time.Time
 }
+
 
 //goland:noinspection ALL
 func (s *AuthService) LdapUserAuth(rw radius.ResponseWriter, r *radius.Request,
-	username string, ldapNode *models.Ldap, radAccept *radius.Packet, vreq *VendorRequest) (*LdapRadisProfile, error) {
+	username string, ldapNode *models.Ldap, radAccept *radius.Packet, vreq *radparser.VendorRequest) (*LdapRadisProfile, error) {
 	ignoreChk := s.GetStringConfig(constant.RadiusIgnorePwd, constant.DISABLED) == constant.ENABLED
 
 	var checkType = "pap"
@@ -101,6 +95,7 @@ func (s *AuthService) LdapUserAuth(rw radius.ResponseWriter, r *radius.Request,
 	// parse ldap radius attr
 	var userProfile = new(LdapRadisProfile)
 	userProfile.ExpireTime = time.Now().Add(time.Hour * 24)
+	userProfile.InterimInterval = int(s.GetIntConfig(constant.AcctInterimInterval, 120))
 	parseLdapRadiusAttrs(sr.Entries[0].GetAttributeValues("radiusReplyItem"), userProfile)
 	userProfile.MacAddr = sr.Entries[0].GetAttributeValue("radiusCallingStationId")
 
@@ -170,8 +165,8 @@ func parseLdapRadiusAttrs(values []string, p *LdapRadisProfile) {
 			p.Domain = strings.TrimSpace(kv[1])
 		case "AddrPool":
 			p.AddrPool = strings.TrimSpace(kv[1])
-		case "IpAddr":
-			p.IpAddr = strings.TrimSpace(kv[1])
+		case "Ipaddr":
+			p.Ipaddr = strings.TrimSpace(kv[1])
 		case "LimitPolicy":
 			p.LimitPolicy = strings.TrimSpace(kv[1])
 		case "UpLimitPolicy":
@@ -183,15 +178,15 @@ func parseLdapRadiusAttrs(values []string, p *LdapRadisProfile) {
 			if err == nil {
 				p.ActiveNum = int(_ActiveNum)
 			}
-		case "UpRate":
+		case "UpRateKbps":
 			_UpRate, err := strconv.ParseInt(kv[1], 10, 64)
 			if err == nil {
-				p.UpRate = int(_UpRate)
+				p.UpRateKbps = int(_UpRate)
 			}
-		case "DownRate":
+		case "DownRateKbps":
 			_DownRate, err := strconv.ParseInt(kv[1], 10, 64)
 			if err == nil {
-				p.DownRate = int(_DownRate)
+				p.DownRateKbps = int(_DownRate)
 			}
 		case "ExpireTime":
 			if kv[1] != "" {

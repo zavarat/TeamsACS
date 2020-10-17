@@ -15,6 +15,7 @@ import (
 	"github.com/ca17/teamsacs/common/mfa"
 	"github.com/ca17/teamsacs/constant"
 	"github.com/ca17/teamsacs/models"
+	radlog "github.com/ca17/teamsacs/radiusd/radlog"
 	"github.com/ca17/teamsacs/radiusd/vendors/microsoft"
 )
 
@@ -38,8 +39,8 @@ func (s *AuthService) GetLocalPassword(user *models.Subscribe, isMacAuth bool) (
 }
 
 // check password
-// passward 不为空为 PAP 认证
-// chapPassword 不为空为 Chap 认证
+// passward is not empty for PAP authentication.
+// chapPassword is not empty for chap authentication.
 func (s *AuthService) CheckPassword(r *radius.Request, username, localpassword string, radAccept *radius.Packet, isMacAuth bool) error {
 	ignoreChk := s.GetStringConfig(constant.RadiusIgnorePwd, constant.DISABLED) == constant.ENABLED
 	password := rfc2865.UserPassword_GetString(r.Packet)

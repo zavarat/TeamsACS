@@ -18,6 +18,8 @@ import (
 	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/config"
 	"github.com/ca17/teamsacs/models"
+	"github.com/ca17/teamsacs/radiusd/radlog"
+	"github.com/ca17/teamsacs/radiusd/radparser"
 )
 
 const (
@@ -38,11 +40,6 @@ const (
 // 并发池
 var gpool = pool.NewLimited(uint(runtime.NumCPU()))
 
-type VendorRequest struct {
-	Macaddr string
-	Vlanid1 int64
-	Vlanid2 int64
-}
 
 type RadiusService struct {
 	Manager   *models.ModelManager
@@ -179,7 +176,7 @@ func (s *RadiusService) GetStringConfig(name string, defval string) string {
 	return s.Manager.GetConfigManager().GetRadiusConfigStringValue(name, defval)
 }
 
-func GetRadiusOnlineFromRequest(r *radius.Request, vr *VendorRequest, vpe *models.Vpe, nasrip string) models.Accounting {
+func GetRadiusOnlineFromRequest(r *radius.Request, vr *radparser.VendorRequest, vpe *models.Vpe, nasrip string) models.Accounting {
 
 	acctInputOctets := int(rfc2866.AcctInputOctets_Get(r.Packet))
 	acctInputGigawords := int(rfc2869.AcctInputGigawords_Get(r.Packet))

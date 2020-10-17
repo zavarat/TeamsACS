@@ -7,6 +7,9 @@ import (
 	"layeh.com/radius"
 	"layeh.com/radius/rfc2865"
 	"layeh.com/radius/rfc2866"
+
+	"github.com/ca17/teamsacs/radiusd/radlog"
+	"github.com/ca17/teamsacs/radiusd/radparser"
 )
 
 // 记账服务
@@ -37,7 +40,7 @@ func (s *AcctService) ServeRADIUS(w radius.ResponseWriter, r *radius.Request) {
 	nasrip := raddrstr[:strings.Index(raddrstr, ":")]
 	var identifier = rfc2865.NASIdentifier_GetString(r.Packet)
 	vpe, err := s.GetNas(nasrip, identifier)
-	CheckError(err)
+	radlog.CheckError(err)
 
 	// 重新设置数据报文秘钥
 	r.Secret = []byte(vpe.Secret)
@@ -46,15 +49,15 @@ func (s *AcctService) ServeRADIUS(w radius.ResponseWriter, r *radius.Request) {
 	// 用户名检查
 	username := rfc2865.UserName_GetString(r.Packet)
 	if username == "" {
-		CheckError(errors.New("username is empty"))
+		radlog.CheckError(errors.New("username is empty"))
 	}
 
-	vendorReq := s.ParseVendor(r, vpe.VendorCode)
+	vendorReq := radparser.ParseVendor(r, vpe.VendorCode)
 
 	// Ldap acct
 	if vpe.LdapId.IsZero() {
 		_, err := s.GetLdap(vpe.LdapId)
-		CheckError(err)
+		radlog.CheckError(err)
 		// check ldap auth
 		s.LdapUserAcct(r, vendorReq, username, vpe, nasrip)
 		// if ok
@@ -64,7 +67,7 @@ func (s *AcctService) ServeRADIUS(w radius.ResponseWriter, r *radius.Request) {
 
 	// 获取有效用户
 	user, err := s.GetUserForAcct(username)
-	CheckError(err)
+	radlog.CheckError(err)
 
 	statusType := rfc2866.AcctStatusType_Get(r.Packet)
 	switch statusType {

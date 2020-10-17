@@ -8,6 +8,8 @@ import (
 
 	"layeh.com/radius"
 	"layeh.com/radius/rfc2865"
+
+	"github.com/ca17/teamsacs/radiusd/authorization"
 )
 
 // 认证服务
@@ -66,7 +68,7 @@ func (s *AuthService) ServeRADIUS(w radius.ResponseWriter, r *radius.Request) {
 		userProfile, err := s.LdapUserAuth(w, r, username, lnode, response, vendorReq)
 		s.CheckRadAuthError(start, username, ip, err)
 		// setup accept
-		s.LdapAcceptAcceptConfig(userProfile, vpe.VendorCode, response)
+		authorization.UpdateAuthorization(userProfile, vpe.VendorCode, response)
 		// if ok
 		s.SendAccept(w, r, response)
 		s.LogAuthSucess(start, username, ip)
@@ -104,7 +106,7 @@ func (s *AuthService) ServeRADIUS(w radius.ResponseWriter, r *radius.Request) {
 	s.CheckRadAuthError(start, username, ip, s.CheckPassword(r, user.Username, localpwd, response, isMacAuth))
 
 	// setup accept
-	s.AcceptAcceptConfig(user, vpe.VendorCode, response)
+	authorization.UpdateAuthorization(user, vpe.VendorCode, response)
 
 	// send accept
 	s.SendAccept(w, r, response)

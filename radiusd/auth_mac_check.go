@@ -4,12 +4,13 @@ import (
 	"errors"
 
 	"github.com/ca17/teamsacs/models"
+	"github.com/ca17/teamsacs/radiusd/radparser"
 )
 
-// mac 绑定检测
-// 用户mac和请求mac同时有效才检测
-// 如果用户mac为空, 就直接更新用户mac
-func (s *AuthService) CheckMacBind(user *models.Subscribe, vendorReq *VendorRequest) error {
+// mac binding detection
+// Detected only if both user mac and request mac are valid.
+// If user mac is empty, update user mac directly.
+func (s *AuthService) CheckMacBind(user *models.Subscribe, vendorReq *radparser.VendorRequest) error {
 	if user.BindMac == 1 {
 		if user.Macaddr != "" && user.Macaddr != "N/A" && vendorReq.Macaddr != "" {
 			if user.Macaddr != vendorReq.Macaddr {

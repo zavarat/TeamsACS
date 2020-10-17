@@ -7,6 +7,7 @@ import (
 	"gopkg.in/go-playground/pool.v3"
 
 	"github.com/ca17/teamsacs/constant"
+	"github.com/ca17/teamsacs/radiusd/radlog"
 )
 
 func (s *RadiusService) addAuthlog(start time.Time, username string, nasip string, result string, reason string) {
@@ -27,7 +28,7 @@ func (s *RadiusService) CheckRadAuthError(start time.Time,username, nasip string
 		if logLevel != RadiusAuthlogNone && (logLevel == RadiusAuthlogAll || logLevel == RadiusAuthFailure) {
 			s.addAuthlog(start, username, nasip, RadiusAuthFailure, err.Error())
 		}
-		if IsDebug() {
+		if radlog.IsDebug() {
 			panic(errors.WithStack(err))
 		} else {
 			panic(err)

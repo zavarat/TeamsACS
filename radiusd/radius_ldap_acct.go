@@ -5,9 +5,10 @@ import (
 	"layeh.com/radius/rfc2866"
 
 	"github.com/ca17/teamsacs/models"
+	"github.com/ca17/teamsacs/radiusd/radparser"
 )
 
-func (s *AcctService) LdapUserAcct(r *radius.Request, vr *VendorRequest, username string, vpe *models.Vpe, nasrip string) {
+func (s *AcctService) LdapUserAcct(r *radius.Request, vr *radparser.VendorRequest, username string, vpe *models.Vpe, nasrip string) {
 	statusType := rfc2866.AcctStatusType_Get(r.Packet)
 	switch statusType {
 	case rfc2866.AcctStatusType_Value_Start:

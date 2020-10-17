@@ -1,4 +1,4 @@
-package radiusd
+package radlog
 
 import (
 	"github.com/op/go-logging"

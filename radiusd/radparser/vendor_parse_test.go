@@ -1,4 +1,4 @@
-package radiusd
+package radparser
 
 import (
 	"fmt"

@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -63,6 +65,7 @@ type Profile struct {
 	ID              primitive.ObjectID `bson:"_id,omitempty" json:"id" query:"id" form:"id"`
 	Name            string             `bson:"name" json:"name" form:"name" query:"name"`
 	Domain          string             `bson:"domain" json:"domain" form:"domain" query:"domain"`
+	InterimInterval int                `bson:"interim_interval" json:"interim_interval" form:"interim_interval" query:"interim_interval"`
 	AddrPool        string             `bson:"addr_pool" json:"addr_pool" form:"addr_pool" query:"addr_pool"`
 	ActiveNum       int                `bson:"active_num" json:"active_num" form:"active_num" query:"active_num"`
 	MfaStatus       string             `bson:"mfa_status" json:"mfa_status" form:"mfa_status" query:"mfa_status"`
@@ -99,7 +102,6 @@ type Subscribe struct {
 	Timestamp  primitive.DateTime   `bson:"timestamp,omitempty" json:"timestamp" form:"-" query:"-"`
 }
 
-
 type Accounting struct {
 	ID                primitive.ObjectID `bson:"_id,omitempty" json:"id" query:"id" form:"id"`
 	Username          string             `bson:"username,omitempty" json:"username" form:"username" query:"username"`
@@ -134,4 +136,48 @@ type Authlog struct {
 	Result    string             `bson:"result,omitempty" json:"result" form:"result" query:"result"`
 	Reason    string             `bson:"reason,omitempty" json:"reason" form:"reason" query:"reason"`
 	Timestamp primitive.DateTime `bson:"timestamp,omitempty" json:"timestamp" form:"-" query:"-"`
+}
+
+
+
+// AuthorizationProfile Method
+
+func (a Subscribe) GetExpireTime() time.Time {
+	return a.ExpireTime.Time()
+}
+
+func (a Subscribe) GetInterimInterval() int {
+	return a.Profile.InterimInterval
+}
+
+func (a Subscribe) GetAddrPool() string {
+	return a.Profile.AddrPool
+}
+
+func (a Subscribe) GetIpaddr() string {
+	return a.Ipaddr
+}
+
+func (a Subscribe) GetUpRateKbps() int {
+	return a.Profile.UpRate
+}
+
+func (a Subscribe) GetDownRateKbps() int {
+	return a.Profile.DownRate
+}
+
+func (a Subscribe) GetDomain() string {
+	return a.Profile.Domain
+}
+
+func (a Subscribe) GetLimitPolicy() string {
+	return a.Profile.LimitPolicy
+}
+
+func (a Subscribe) GetUpLimitPolicy() string {
+	return a.Profile.UpLimitPolicy
+}
+
+func (a Subscribe) GetDownLimitPolicy() string {
+	return a.Profile.DownLimitPolicy
 }
