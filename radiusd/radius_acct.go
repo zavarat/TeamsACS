@@ -56,7 +56,7 @@ func (s *AcctService) ServeRADIUS(w radius.ResponseWriter, r *radius.Request) {
 	vendorReq := radparser.ParseVendor(r, vpe.VendorCode)
 
 	// Ldap acct
-	if vpe.LdapId.IsZero() {
+	if !vpe.LdapId.IsZero() {
 		_, err := s.GetLdap(vpe.LdapId)
 		radlog.CheckError(err)
 		// check ldap auth
