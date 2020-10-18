@@ -8,6 +8,7 @@ import (
 	"layeh.com/radius/rfc2865"
 	"layeh.com/radius/rfc2866"
 
+	"github.com/ca17/teamsacs/radiusd/debug"
 	"github.com/ca17/teamsacs/radiusd/radlog"
 	"github.com/ca17/teamsacs/radiusd/radparser"
 )
@@ -32,7 +33,7 @@ func (s *AcctService) ServeRADIUS(w radius.ResponseWriter, r *radius.Request) {
 	}()
 
 	if s.GetAppConfig().Radiusd.Debug {
-		radlog.Info(FmtRequest(r))
+		radlog.Info(debug.FmtRequest(r))
 	}
 
 	// NAS 接入检查
@@ -72,15 +73,15 @@ func (s *AcctService) ServeRADIUS(w radius.ResponseWriter, r *radius.Request) {
 	statusType := rfc2866.AcctStatusType_Get(r.Packet)
 	switch statusType {
 	case rfc2866.AcctStatusType_Value_Start:
-		s.DoAcctStart(r, vendorReq, user.Username, vpe, nasrip)
+		s.processAcctStart(r, vendorReq, user.Username, vpe, nasrip)
 	case rfc2866.AcctStatusType_Value_InterimUpdate:
-		s.DoAcctUpdateBefore(r, vendorReq, user, vpe, nasrip)
+		s.processAcctUpdateBefore(r, vendorReq, user, vpe, nasrip)
 	case rfc2866.AcctStatusType_Value_Stop:
-		s.DoAcctStop(r, vendorReq, user.Username, vpe, nasrip)
+		s.processAcctStop(r, vendorReq, user.Username, vpe, nasrip)
 	case rfc2866.AcctStatusType_Value_AccountingOn:
-		s.DoAcctNasOn(r)
+		s.processAcctNasOn(r)
 	case rfc2866.AcctStatusType_Value_AccountingOff:
-		s.DoAcctNasOff(r)
+		s.processAcctNasOff(r)
 	}
 
 	s.SendResponse(w, r)
@@ -91,7 +92,7 @@ func (s *AcctService) SendResponse(w radius.ResponseWriter, r *radius.Request) {
 	err := w.Write(resp)
 	radlog.Infof("Writing %v to %v", resp.Code, r.RemoteAddr)
 	if s.GetAppConfig().Radiusd.Debug {
-		radlog.Info(FmtResponse(resp, r.RemoteAddr))
+		radlog.Info(debug.FmtResponse(resp, r.RemoteAddr))
 	}
 	if err != nil {
 		radlog.Error(err)

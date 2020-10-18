@@ -80,12 +80,12 @@ func (s *RadiusService) GetUser(username string, macauth bool) (*models.Subscrib
 	user := new(models.Subscribe)
 	var err error
 	if macauth {
-		user, err = m.FindSubscribeByUser(username)
+		user, err = m.GetSubscribeByUser(username)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		user, err = m.FindSubscribeByMac(username)
+		user, err = m.GetSubscribeByMac(username)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				return nil, fmt.Errorf("user:%s not exists", username)
@@ -106,7 +106,7 @@ func (s *RadiusService) GetUser(username string, macauth bool) (*models.Subscrib
 // 获取Ldap 服务节点新
 func (s *RadiusService) GetLdap(id primitive.ObjectID) (*models.Ldap, error) {
 	m := s.Manager.GetLdapManager()
-	ld, err := m.FindLdapBySid(id)
+	ld, err := m.FindLdapById(id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("Ldap node:%s not exists", id)
@@ -124,7 +124,7 @@ func (s *RadiusService) GetLdap(id primitive.ObjectID) (*models.Ldap, error) {
 // 获取用户, 不判断用户过期等状态
 func (s *RadiusService) GetUserForAcct(username string) (*models.Subscribe, error) {
 	m := s.Manager.GetSubscribeManager()
-	user, err := m.FindSubscribeByUser(username)
+	user, err := m.GetSubscribeByUser(username)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (s *RadiusService) GetUserForAcct(username string) (*models.Subscribe, erro
 func (s *RadiusService) UpdateUserMac(username string, macaddr string) {
 	gpool.Queue(func() pool.WorkFunc {
 		return func(pool.WorkUnit) (interface{}, error) {
-			err := s.Manager.GetSubscribeManager().UpdateSubscribeByUser(username, models.Doc{"macaddr": macaddr})
+			err := s.Manager.GetSubscribeManager().UpdateSubscribeByUsername(username, models.Doc{"macaddr": macaddr})
 			if err != nil {
 				radlog.Warningf("update user:%s mac_addr:%s error", username, macaddr)
 			}
@@ -147,7 +147,7 @@ func (s *RadiusService) UpdateUserMac(username string, macaddr string) {
 func (s *RadiusService) UpdateUserVlanid1(username string, vlanid1 int) {
 	gpool.Queue(func() pool.WorkFunc {
 		return func(pool.WorkUnit) (interface{}, error) {
-			err := s.Manager.GetSubscribeManager().UpdateSubscribeByUser(username, models.Doc{"vlanid1": vlanid1})
+			err := s.Manager.GetSubscribeManager().UpdateSubscribeByUsername(username, models.Doc{"vlanid1": vlanid1})
 			if err != nil {
 				radlog.Warningf("update user:%s vlanid1:%s error", username, vlanid1)
 			}
@@ -159,7 +159,7 @@ func (s *RadiusService) UpdateUserVlanid1(username string, vlanid1 int) {
 func (s *RadiusService) UpdateUserVlanid2(username string, vlanid2 int) {
 	gpool.Queue(func() pool.WorkFunc {
 		return func(pool.WorkUnit) (interface{}, error) {
-			err := s.Manager.GetSubscribeManager().UpdateSubscribeByUser(username, models.Doc{"vlanid2": vlanid2})
+			err := s.Manager.GetSubscribeManager().UpdateSubscribeByUsername(username, models.Doc{"vlanid2": vlanid2})
 			if err != nil {
 				radlog.Warningf("update user:%s vlanid2:%s error", username, vlanid2)
 			}

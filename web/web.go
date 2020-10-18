@@ -27,6 +27,7 @@ type WebContext struct {
 	Config  *config.AppConfig
 }
 
+// WebHandler
 type WebHandler interface {
 	InitRouter(group *echo.Group)
 }

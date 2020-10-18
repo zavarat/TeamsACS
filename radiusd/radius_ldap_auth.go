@@ -23,17 +23,22 @@ import (
 
 type LdapRadisProfile struct {
 	AuthorizationProfile
-	Status          string
-	MacAddr         string
-	MfaSecret       string
-	MfaStatus       string
-	ActiveNum       int
+	Status    string
+	MacAddr   string
+	MfaSecret string
+	MfaStatus string
+	ActiveNum int
 }
 
-
 //goland:noinspection ALL
-func (s *AuthService) LdapUserAuth(rw radius.ResponseWriter, r *radius.Request,
-	username string, ldapNode *models.Ldap, radAccept *radius.Packet, vreq *radparser.VendorRequest) (*LdapRadisProfile, error) {
+func (s *AuthService) LdapUserAuth(
+	rw radius.ResponseWriter,
+	r *radius.Request,
+	username string,
+	ldapNode *models.Ldap,
+	radAccept *radius.Packet,
+	vreq *radparser.VendorRequest, ) (*LdapRadisProfile, error) {
+
 	ignoreChk := s.GetStringConfig(constant.RadiusIgnorePwd, constant.DISABLED) == constant.ENABLED
 
 	var checkType = "pap"

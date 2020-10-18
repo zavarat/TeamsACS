@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type SubscribeManager struct{ *ModelManager }
@@ -13,7 +14,7 @@ func (m *ModelManager) GetSubscribeManager() *SubscribeManager {
 	return store.(*SubscribeManager)
 }
 
-func (m *SubscribeManager) FindSubscribeByUser(username string) (*Subscribe, error) {
+func (m *SubscribeManager) GetSubscribeByUser(username string) (*Subscribe, error) {
 	coll := m.GetTeamsAcsCollection(TeamsacsSubscribe)
 	doc := coll.FindOne(context.TODO(), bson.M{"username":username})
 	err := doc.Err()
@@ -26,7 +27,7 @@ func (m *SubscribeManager) FindSubscribeByUser(username string) (*Subscribe, err
 }
 
 
-func (m *SubscribeManager) FindSubscribeByMac(mac string) (*Subscribe, error) {
+func (m *SubscribeManager) GetSubscribeByMac(mac string) (*Subscribe, error) {
 	coll := m.GetTeamsAcsCollection(TeamsacsSubscribe)
 	doc := coll.FindOne(context.TODO(), bson.M{"macaddr":mac})
 	err := doc.Err()
@@ -39,8 +40,16 @@ func (m *SubscribeManager) FindSubscribeByMac(mac string) (*Subscribe, error) {
 }
 
 
-func (m *SubscribeManager) UpdateSubscribeByUser(username string, valmap map[string]interface{})  error {
+func (m *SubscribeManager) UpdateSubscribeByUsername(username string, valmap map[string]interface{})  error {
 	coll := m.GetTeamsAcsCollection(TeamsacsSubscribe)
 	_, err := coll.UpdateOne(context.TODO(), bson.M{"username":username}, valmap)
 	return err
+}
+
+func (m *SubscribeManager) AddSubscribe(subs *Subscribe) (string, error) {
+	r, err := m.GetTeamsAcsCollection(TeamsacsSubscribe).InsertOne(context.TODO(), subs)
+	if err != nil {
+		return "", err
+	}
+	return r.InsertedID.(primitive.ObjectID).Hex(), err
 }

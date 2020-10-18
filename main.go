@@ -16,6 +16,7 @@ import (
 	"github.com/ca17/teamsacs/grpcservice"
 	"github.com/ca17/teamsacs/models"
 	"github.com/ca17/teamsacs/radiusd"
+	"github.com/ca17/teamsacs/radiusd/radlog"
 	"github.com/ca17/teamsacs/web"
 )
 
@@ -36,7 +37,7 @@ var (
 //go:generate esc -o common/resources/resources.go -pkg resources -ignore=".DS_Store" resources
 //go:generate protoc -I ./grpcservice --go_out=plugins=grpc:./grpcservice  ./grpcservice/service.proto
 
-// 命令行定义
+// Command line definition
 var (
 	h          = flag.Bool("h", false, "help usage")
 	showVer    = flag.Bool("v", false, "show version")
@@ -51,7 +52,7 @@ var (
 	initSuper  = flag.Bool("initsuper", false, "init super password to 'Teams@Acs' ")
 )
 
-// 打印版本信息
+// Print version information
 func PrintVersion() {
 	fmt.Fprintf(os.Stdout, "build name:\t%s\n", BuildName)
 	fmt.Fprintf(os.Stdout, "build version:\t%s\n", BuildVersion)
@@ -103,7 +104,7 @@ func setupLogging(appconfig *config.AppConfig) {
 	if appconfig.Radiusd.Debug {
 		radlevel = logging.DEBUG
 	}
-	radiusd.SetupLog(radlevel, appconfig.System.SyslogAddr, appconfig.GetLogDir(), "Radiusd")
+	radlog.SetupLog(radlevel, appconfig.System.SyslogAddr, appconfig.GetLogDir(), "Radiusd")
 
 }
 

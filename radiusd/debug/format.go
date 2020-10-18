@@ -1,4 +1,4 @@
-package radiusd
+package debug
 
 import (
 	"encoding/binary"
@@ -18,21 +18,31 @@ import (
 	"layeh.com/radius/rfc4849"
 )
 
+// Provide a function to format and display data messages for easy debugging during development.
+// extension method, which allows you to carry separate formatting functions for specific properties, currently using the Hex format directly.
+// Note that the formatting function has resource overhead, it is recommended to have a switch to control it, e.g. if debug { FormatPacket(pkt) }
 
+// Formatting String Properties
 var stringFormat = func(src []byte) string {
 	return string(src)
 }
 
+// Formatting some hard-to-understand properties into Hex
 var hexFormat = hex.EncodeToString
 
+// Formatting the Uint32 Property
 var uInt32Format = func(src []byte) string {
 	return strconv.Itoa(int(binary.BigEndian.Uint32(src)))
 }
 
+
+// Formatting IPv4 Properties
 var ipv4Format = func(src []byte) string {
 	return net.IPv4(src[0], src[1], src[2], src[3]).String()
 }
 
+
+// Register dictionary properties for quick access to string names.
 var radiusTypeMap = map[radius.Type]string{
 	rfc2865.UserName_Type:               "UserName",
 	rfc2865.UserPassword_Type:           "UserPassword",
@@ -125,6 +135,8 @@ var radiusTypeMap = map[radius.Type]string{
 	rfc2868.TunnelServerAuthID_Type:     "TunnelServerAuthID",
 }
 
+
+// Register common formatting functions for quick property formatting.
 var radiusTypeFuncMap = map[radius.Type]func(s []byte) string{
 	rfc2865.UserName_Type:               stringFormat,
 	rfc2865.UserPassword_Type:           hexFormat,
@@ -217,6 +229,8 @@ var radiusTypeFuncMap = map[radius.Type]func(s []byte) string{
 	rfc2868.TunnelServerAuthID_Type:     hexFormat,
 }
 
+
+// Formatting Type
 func formatType(t radius.Type) string {
 	v, ok := radiusTypeMap[t]
 	if !ok {
@@ -225,6 +239,7 @@ func formatType(t radius.Type) string {
 	return v
 }
 
+// Formatting Properties
 func formatAttribute(avp *radius.AVP) string {
 	vfunc, ok := radiusTypeFuncMap[avp.Type]
 	if !ok {
@@ -248,7 +263,25 @@ func FmtResponse(p *radius.Packet, RemoteAddr net.Addr) string {
 }
 
 
-
+// Formatting radius packet, e.g.
+//
+/*
+	RADIUS Packet:
+		Identifier: 102
+	    Code: 1
+	    Authenticator:b1a275222be6b9f7e21585e11bd6d396
+	    Attributes:
+	        UserName: test
+	        UserPassword: dcff9f2a6fc7673ed5d58221a7aedaf0
+	        NASIdentifier: tradtest
+	        NASIPAddress: 10.10.10.10
+	        NASPort: 0
+	        NASPortType: 0
+	        NASPortID: slot=2;subslot=2;port=22;vlanid=100;
+	        CalledStationID: 11:11:11:11:11:11
+	        CallingStationID: 11:11:11:11:11:11
+	        VendorSpecific(14988,9): 4d696b726f74696b
+*/
 func FormatPacket(p *radius.Packet) string {
 	var buff = new(strings.Builder)
 	buff.WriteString("RADIUS Packet: \n")

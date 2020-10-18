@@ -10,6 +10,9 @@ import (
 	"layeh.com/radius/rfc2865"
 
 	"github.com/ca17/teamsacs/radiusd/authorization"
+	"github.com/ca17/teamsacs/radiusd/debug"
+	"github.com/ca17/teamsacs/radiusd/radlog"
+	"github.com/ca17/teamsacs/radiusd/radparser"
 )
 
 // 认证服务
@@ -35,7 +38,7 @@ func (s *AuthService) ServeRADIUS(w radius.ResponseWriter, r *radius.Request) {
 	}()
 
 	if s.GetAppConfig().Radiusd.Debug {
-		radlog.Info(FmtRequest(r))
+		radlog.Info(debug.FmtRequest(r))
 	}
 
 	// nas access check
@@ -57,7 +60,7 @@ func (s *AuthService) ServeRADIUS(w radius.ResponseWriter, r *radius.Request) {
 	r.Packet.Secret = []byte(vpe.Secret)
 	response := r.Response(radius.CodeAccessAccept)
 
-	vendorReq := s.ParseVendor(r, vpe.VendorCode)
+	vendorReq := radparser.ParseVendor(r, vpe.VendorCode)
 
 	// ----------------------------------------------------------------------------------------------------
 	// Ldap auth
@@ -110,9 +113,8 @@ func (s *AuthService) ServeRADIUS(w radius.ResponseWriter, r *radius.Request) {
 
 	// send accept
 	s.SendAccept(w, r, response)
-	if user.Macaddr != vendorReq.Macaddr {
-		s.UpdateUserMac(user.Username, vendorReq.Macaddr)
-	}
+	// update mac & vlan
+	s.UpdateBind(user, vendorReq)
 
 	s.LogAuthSucess(start, username, ip)
 }
@@ -121,7 +123,7 @@ func (s *AuthService) ServeRADIUS(w radius.ResponseWriter, r *radius.Request) {
 func (s *AuthService) SendAccept(w radius.ResponseWriter, r *radius.Request, resp *radius.Packet) {
 	radlog.Infof("Writing %v to %v", resp.Code, r.RemoteAddr)
 	if s.GetAppConfig().Radiusd.Debug {
-		radlog.Info(FmtResponse(resp, r.RemoteAddr))
+		radlog.Info(debug.FmtResponse(resp, r.RemoteAddr))
 	}
 	err := w.Write(resp)
 	if err != nil {
@@ -150,7 +152,7 @@ func (s *AuthService) SendReject(w radius.ResponseWriter, r *radius.Request, mes
 	}
 	radlog.Infof("Writing %v to %v", code, r.RemoteAddr)
 	if s.GetAppConfig().Radiusd.Debug {
-		radlog.Info(FmtResponse(resp, r.RemoteAddr))
+		radlog.Info(debug.FmtResponse(resp, r.RemoteAddr))
 	}
 	err := w.Write(resp)
 	if err != nil {

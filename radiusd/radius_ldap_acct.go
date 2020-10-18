@@ -12,14 +12,14 @@ func (s *AcctService) LdapUserAcct(r *radius.Request, vr *radparser.VendorReques
 	statusType := rfc2866.AcctStatusType_Get(r.Packet)
 	switch statusType {
 	case rfc2866.AcctStatusType_Value_Start:
-		s.DoAcctStart(r, vr, username, vpe, nasrip)
+		s.processAcctStart(r, vr, username, vpe, nasrip)
 	case rfc2866.AcctStatusType_Value_InterimUpdate:
-		s.DoAcctUpdate(r, vr, username, vpe, nasrip)
+		s.processAcctUpdate(r, vr, username, vpe, nasrip)
 	case rfc2866.AcctStatusType_Value_Stop:
-		s.DoAcctStop(r, vr, username, vpe, nasrip)
+		s.processAcctStop(r, vr, username, vpe, nasrip)
 	case rfc2866.AcctStatusType_Value_AccountingOn:
-		s.DoAcctNasOn(r)
+		s.processAcctNasOn(r)
 	case rfc2866.AcctStatusType_Value_AccountingOff:
-		s.DoAcctNasOff(r)
+		s.processAcctNasOff(r)
 	}
 }

@@ -14,7 +14,7 @@ func (m *ModelManager) GetLdapManager() *LdapManager {
 	return store.(*LdapManager)
 }
 
-func (m *LdapManager) FindLdapBySid(id primitive.ObjectID) (*Ldap, error) {
+func (m *LdapManager) FindLdapById(id primitive.ObjectID) (*Ldap, error) {
 	coll := m.GetTeamsAcsCollection(TeamsacsLdap)
 	doc := coll.FindOne(context.TODO(), bson.M{"_id":id})
 	err := doc.Err()
