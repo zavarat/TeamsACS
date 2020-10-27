@@ -4,7 +4,7 @@ TeamsACS is committed to providing work teams with exceptional ease of network m
 
 ## Systems Architecture
 
-![image](https://user-images.githubusercontent.com/377938/97299613-2c265900-1890-11eb-9078-a787238217c2.png)
+![TeamsACS](https://user-images.githubusercontent.com/377938/97300818-e7032680-1891-11eb-9b7d-6f10b103a5cd.png)
 
 ## System Features
 
