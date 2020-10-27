@@ -21,6 +21,9 @@ TeamsACS 致力于为工作团队提供卓越的网络管理便捷性。我们�
 ### 北向接口 Northbound Interface
 
 - 面向各类第三方管理系统提供统一的API， 基于 HTTPS Json 协议。
+- 提供基础设备信息以及状态数据的查询 API， 以及数据维护 API。
+- 提供各种策略管理 API， 比如防火墙规则，路由表等。
+
 
 ##  License
 

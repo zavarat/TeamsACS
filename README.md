@@ -22,8 +22,9 @@ It is also the officially recommended system by Mikrotik, which has been tested 
 
 ### Northbound Interface
 
-- Provides a unified API for various third-party management systems, based on the HTTPS Json protocol.
-
+- Provide a unified API for various third-party management systems, based on HTTPS Json protocol.
+- Provide the query API for basic device information and status data, and data maintenance API.
+- Provide a variety of policy management APIs, such as firewall rules, routing tables and so on.
 
 ##  License
 
