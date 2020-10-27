@@ -6,7 +6,19 @@ TeamsACS 致力于为工作团队提供卓越的网络管理便捷性。我们�
 
 ## 系统架构
 
-![TeamsACS](https://user-images.githubusercontent.com/377938/97300818-e7032680-1891-11eb-9b7d-6f10b103a5cd.png)
+![image](https://user-images.githubusercontent.com/377938/97301570-e28b3d80-1892-11eb-85a8-5cc5f80449a4.png)
 
 ## 系统功能特性
+
+### TR069 ACS 集成
+
+首选 GenieACS 开源ACS系统集成， GenieACS可以与任何支持TR-069协议的设备一起工作。它能自动发现设备的参数树（包括特定于厂商的参数），不对设备的数据模型做任何预定义。
+
+它已经与许多不同制造商的各种设备（DSL、电缆、光纤、LTE CPE、VoIP电话）进行了测试。
+
+同时也是 Mikrotik 官方推荐的系统，经过了大量的测试， 可以很放心的使用。
+
+### 北向接口 Northbound Interface
+
+- 面向各类第三方管理系统提供统一的API， 基于 HTTPS Json 协议。
 

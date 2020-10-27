@@ -6,7 +6,20 @@ The core of the system is based on Golang technology, providing excellent perfor
 
 ## Systems Architecture
 
-![TeamsACS](https://user-images.githubusercontent.com/377938/97300818-e7032680-1891-11eb-9b7d-6f10b103a5cd.png)
+![image](https://user-images.githubusercontent.com/377938/97301570-e28b3d80-1892-11eb-85a8-5cc5f80449a4.png)
 
 ## System Features
 
+### TR069 ACS integration
+
+Preferring GenieACS open source ACS system integration， GenieACS can work with any device that supports the TR-069 protocol.
+
+It auto-discovers the device’s parameter tree (including vendor-specific parameters) making no assumptions about the device’s data model.
+
+It’s been tested with a wide range of devices (DSL, cable, fiber optics, LTE CPEs, VoIP phones) from many different manufacturers.
+
+It is also the officially recommended system by Mikrotik, which has been tested extensively and is safe to use.
+
+### Northbound Interface
+
+- Provides a unified API for various third-party management systems, based on the HTTPS Json protocol.
