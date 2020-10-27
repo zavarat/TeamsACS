@@ -67,7 +67,7 @@ ci:
 push:
 	@read -p "type commit message: " cimsg; \
 	git ci -am "$(shell date "+%F %T") $${cimsg}"
-	git push origin master
+	git push origin main
 
 .PHONY: clean build rpccert webcert
 

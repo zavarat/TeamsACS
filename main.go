@@ -49,7 +49,6 @@ var (
 	CommitSubject  string
 )
 
-//go:generate esc -o common/static/static.go -pkg static -ignore=".DS_Store,webix_debug.*,webix.js" static
 //go:generate esc -o common/resources/resources.go -pkg resources -ignore=".DS_Store" resources
 //go:generate protoc -I ./grpcservice --go_out=plugins=grpc:./grpcservice  ./grpcservice/service.proto
 

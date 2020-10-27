@@ -29,7 +29,6 @@ import (
 
 	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/common/log"
-	"github.com/ca17/teamsacs/common/static"
 	"github.com/ca17/teamsacs/common/tpl"
 	"github.com/ca17/teamsacs/models"
 )
@@ -50,19 +49,13 @@ func ListenAdminServer(manager *models.ModelManager) error {
 		SigningMethod: middleware.AlgorithmHS256,
 		SigningKey:    []byte(manager.Config.Web.JwtSecret),
 		Skipper: func(c echo.Context) bool {
-			skips := []string{"", "/", "/login", "/verifymfa", "/opr/verifymfa"}
-			if common.InSlice(c.Request().RequestURI, skips) ||
-				strings.HasPrefix(c.Path(), "/static") ||
-				strings.HasSuffix(c.Path(), ".css") ||
-				strings.HasSuffix(c.Path(), ".css") ||
-				strings.HasSuffix(c.Path(), ".gif") ||
-				strings.HasSuffix(c.Path(), ".png") {
+			if strings.HasPrefix(c.Path(), "/api/status") || strings.HasPrefix(c.Path(), "/api/token") {
 				return true
 			}
 			return false
 		},
 		ErrorHandler: func(err error) error {
-			return NewHTTPError(http.StatusBadRequest, "Missing tokens, limited access to resources")
+			return NewHTTPError(http.StatusBadRequest, "Missing tokens, Access denied")
 		},
 	}
 	e.Use(middleware.JWTWithConfig(*manager.WebJwtConfig))
@@ -76,12 +69,6 @@ func ListenAdminServer(manager *models.ModelManager) error {
 
 	manager.TplRender = tpl.NewCommonTemplate([]string{"/resources/templates"}, manager.Dev, manager.GetTemplateFuncMap())
 	e.Renderer = manager.TplRender
-	if manager.Dev {
-		e.Static("/static", "static")
-	} else {
-		e.GET("/static/*", echo.WrapHandler(http.FileServer(static.FS(false))))
-	}
-
 	e.Pre(middleware.Rewrite(map[string]string{
 		"/freeradius/*": "/api/freeradius/$1",
 		"/favicon.ico":  "/static/favicon.ico",
