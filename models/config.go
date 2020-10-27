@@ -32,7 +32,7 @@ func (m *ModelManager) GetConfigManager() *ConfigManager {
 
 
 func (m *ConfigManager) GetConfigValue(ctype, name string) string{
-	coll := m.GetTeamsAcsCollection(TeamsacsVpe)
+	coll := m.GetTeamsAcsCollection(TeamsacsConfig)
 	doc := coll.FindOne(context.TODO(), bson.M{"type":ctype, "name":name})
 	err := doc.Err()
 	if err != nil {
@@ -44,7 +44,7 @@ func (m *ConfigManager) GetConfigValue(ctype, name string) string{
 }
 
 func (m *ConfigManager) GetRadiusConfigValue(name string) string{
-	coll := m.GetTeamsAcsCollection(TeamsacsVpe)
+	coll := m.GetTeamsAcsCollection(TeamsacsConfig)
 	doc := coll.FindOne(context.TODO(), bson.M{"type":"radius", "name":name})
 	err := doc.Err()
 	if err != nil {
