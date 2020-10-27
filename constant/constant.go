@@ -17,6 +17,7 @@
 package constant
 
 const (
+	NA = "N/A"
 	ENABLED = "enabled"
 	DISABLED = "disabled"
 )

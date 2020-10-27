@@ -35,4 +35,10 @@ func  (h *HttpHandler)  InitAllRouter(e *echo.Echo) {
 	e.Add(http.MethodGet, "/cpe/mikrotik/device/ipinterfaces", h.QueryMikrotikDeviceIpInterfaces)
 	e.Add(http.MethodGet, "/cpe/mikrotik/device/routers", h.QueryMikrotikDeviceRouters)
 	e.Add(http.MethodGet, "/cpe/mikrotik/device/dns", h.QueryMikrotikDeviceDnsClientServer)
+
+	// Cpe apis
+	e.Add(http.MethodPost,  "/cpe/add", h.AddCpe)
+	e.Add(http.MethodGet,  "/cpe/query", h.QueryCpe)
+	e.Add(http.MethodPost,  "/cpe/update", h.UpdateCpeAttrs)
+	e.Add(http.MethodGet,  "/cpe/delete", h.DeleteCpe)
 }

@@ -52,8 +52,31 @@ type OpsLog struct {
 	Timestamp primitive.DateTime `bson:"timestamp,omitempty" json:"timestamp" form:"-" query:"-"`
 }
 
+// VariableConfig
+type VariableConfig struct {
+	ID     primitive.ObjectID `bson:"_id,omitempty" json:"id" query:"id" form:"id"`
+	Vendor string             `bson:"vendor" json:"vendor" form:"vendor" query:"vendor"`
+	Group  string             `bson:"group" json:"group" form:"group" query:"group"`
+	Values bsonx.Doc          `bson:"values" json:"values" form:"values" query:"values"`
+	Remark string             `bson:"remark" json:"remark" form:"remark" query:"remark"`
+}
+
+// Cpe
+// attrs: Extended Attributes
+type Cpe struct {
+	Id         primitive.ObjectID `bson:"_id,omitempty" json:"id" query:"id" form:"id"`
+	Sn         string             `bson:"sn" json:"sn" form:"sn" query:"sn"`
+	DeviceId   string             `bson:"device_id" json:"device_id" form:"device_id" query:"device_id" `
+	Attrs      bsonx.Doc          `bson:"attrs" json:"attrs" `
+	CreateTime primitive.DateTime `bson:"create_time" json:"create_time" `
+	UpdateTime primitive.DateTime `bson:"update_time" json:"update_time" `
+}
+
 type Vpe struct {
 	ID         primitive.ObjectID `bson:"_id,omitempty" json:"id" query:"id" form:"id"`
+	Sn         string             `bson:"sn" json:"sn" form:"sn" query:"sn"`
+	DeviceId   string             `bson:"device_id" json:"device_id" form:"device_id" query:"device_id" `
+	Attrs      bsonx.Doc          `bson:"attrs" json:"attrs" `
 	Identifier string             `bson:"identifier,omitempty" json:"identifier" form:"identifier" query:"identifier"`
 	Name       string             `bson:"name,omitempty" json:"name" form:"name" query:"name"`
 	Ipaddr     string             `bson:"ipaddr,omitempty" json:"ipaddr" form:"ipaddr" query:"ipaddr"`
@@ -195,23 +218,4 @@ func (a Subscribe) GetUpLimitPolicy() string {
 
 func (a Subscribe) GetDownLimitPolicy() string {
 	return a.Profile.DownLimitPolicy
-}
-
-// MikrotikArgConfig
-type MikrotikArgConfig struct {
-	ID     primitive.ObjectID `bson:"_id,omitempty" json:"id" query:"id" form:"id"`
-	Group  string             `bson:"group" json:"group" form:"group" query:"group"`
-	Values bsonx.Doc          `bson:"values" json:"values" form:"values" query:"values"`
-	Remark string             `bson:"remark" json:"remark" form:"remark" query:"remark"`
-}
-
-// Cpe
-// attrs: Extended Attributes
-type Cpe struct {
-	Id         primitive.ObjectID `bson:"_id,omitempty" json:"id" query:"id" form:"id"`
-	Sn         string             `bson:"sn" json:"sn" form:"sn" query:"sn"`
-	DeviceId   string             `bson:"device_id" json:"device_id" form:"device_id" query:"device_id" `
-	Attrs      bsonx.Doc          `bson:"attrs" json:"attrs" `
-	CreateTime primitive.DateTime `bson:"create_time" json:"create_time" `
-	UpdateTime primitive.DateTime `bson:"update_time" json:"update_time" `
 }

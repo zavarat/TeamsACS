@@ -70,10 +70,10 @@ func (m *CpeManager) QueryCpes(form *web.WebForm) (*web.PageResult, error) {
 	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
 	var q = bson.M{}
 	for qname, vals := range form.Gets {
-		if !strings.HasPrefix(qname, "attr_") {
+		if !strings.HasPrefix(qname, "attrs.") {
 			continue
 		}
-		q["attrs."+qname[5:]] = vals[0]
+		q[qname] = vals[0]
 	}
 	cur, err := coll.Find(context.TODO(), q, findOptions)
 	if err != nil {
@@ -110,7 +110,10 @@ func (m *CpeManager) AddCpe(form *web.WebForm) error {
 	cpe.UpdateTime = primitive.NewDateTimeFromTime(time.Now())
 	cpe.Attrs = bsonx.Doc{}
 	for k, v := range form.Posts {
-		cpe.Attrs.Set(k, bsonx.String(v[0]))
+		if !strings.HasPrefix(k, "attrs.") {
+			continue
+		}
+		cpe.Attrs.Set(k[6:], bsonx.String(v[0]))
 	}
 	_, err := coll.InsertOne(context.TODO(), cpe)
 	return err
@@ -125,7 +128,10 @@ func (m *CpeManager) UpdateCpeAttrs(form *web.WebForm) error {
 		"update_time": primitive.NewDateTimeFromTime(time.Now()),
 	}
 	for k, v := range form.Posts {
-		data["attrs."+k] = v[0]
+		if !strings.HasPrefix(k, "attrs.") {
+			continue
+		}
+		data[k] = v[0]
 	}
 	query := bson.M{"sn": sn}
 	update := bson.M{"$set": data}
