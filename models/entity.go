@@ -1,9 +1,26 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package models
 
 import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/x/bsonx"
 )
 
 type Config struct {
@@ -26,9 +43,9 @@ type Operator struct {
 	Remark    string             `bson:"remark,omitempty" json:"remark" form:"remark" query:"remark"`
 }
 
-type OprLog struct {
+type OpsLog struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id" query:"id" form:"id"`
-	Oprname   string             `bson:"oprname,omitempty" json:"oprname" form:"oprname" query:"oprname"`
+	Username  string             `bson:"username,omitempty" json:"username" form:"username" query:"username"`
 	Srcip     string             `bson:"srcip,omitempty" json:"srcip" form:"srcip" query:"srcip"`
 	Action    string             `bson:"action,omitempty" json:"action" form:"action" query:"action"`
 	Remark    string             `bson:"remark,omitempty" json:"remark" form:"remark" query:"remark"`
@@ -138,8 +155,6 @@ type Authlog struct {
 	Timestamp primitive.DateTime `bson:"timestamp,omitempty" json:"timestamp" form:"-" query:"-"`
 }
 
-
-
 // AuthorizationProfile Method
 
 func (a Subscribe) GetExpireTime() time.Time {
@@ -180,4 +195,23 @@ func (a Subscribe) GetUpLimitPolicy() string {
 
 func (a Subscribe) GetDownLimitPolicy() string {
 	return a.Profile.DownLimitPolicy
+}
+
+// MikrotikArgConfig
+type MikrotikArgConfig struct {
+	ID     primitive.ObjectID `bson:"_id,omitempty" json:"id" query:"id" form:"id"`
+	Group  string             `bson:"group" json:"group" form:"group" query:"group"`
+	Values bsonx.Doc          `bson:"values" json:"values" form:"values" query:"values"`
+	Remark string             `bson:"remark" json:"remark" form:"remark" query:"remark"`
+}
+
+// Cpe
+// attrs: Extended Attributes
+type Cpe struct {
+	Id         primitive.ObjectID `bson:"_id,omitempty" json:"id" query:"id" form:"id"`
+	Sn         string             `bson:"sn" json:"sn" form:"sn" query:"sn"`
+	DeviceId   string             `bson:"device_id" json:"device_id" form:"device_id" query:"device_id" `
+	Attrs      bsonx.Doc          `bson:"attrs" json:"attrs" `
+	CreateTime primitive.DateTime `bson:"create_time" json:"create_time" `
+	UpdateTime primitive.DateTime `bson:"update_time" json:"update_time" `
 }

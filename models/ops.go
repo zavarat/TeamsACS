@@ -14,4 +14,36 @@
  *
  */
 
-package log
+package models
+
+import (
+	"context"
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+
+	"github.com/ca17/teamsacs/common/log"
+)
+
+type OpsManager struct{ *ModelManager }
+
+func (m *ModelManager) GetOpsManager() *OpsManager {
+	store, _ := m.ManagerMap.Get("OpsManager")
+	return store.(*OpsManager)
+}
+
+func (m *OpsManager) AddOpsLog(username string, srcip string, action string, remark string)  {
+	authlog := OpsLog{
+		Username:  username,
+		Srcip:     srcip,
+		Action:    action,
+		Remark:    remark,
+		Timestamp: primitive.NewDateTimeFromTime(time.Now()),
+	}
+	coll := m.GetTeamsAcsCollection(TeamsacsOpslog)
+	_, err := coll.InsertOne(context.TODO(), authlog)
+	if err != nil {
+		log.Error(err)
+	}
+}
+

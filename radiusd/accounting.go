@@ -43,7 +43,7 @@ func (s *AcctService) processAcctUpdateBefore(r *radius.Request, vr *radparser.V
 func (s *AcctService) processAcctUpdate(r *radius.Request, vr *radparser.VendorRequest,  username string, vpe *models.Vpe, nasrip string) {
 	online := GetRadiusOnlineFromRequest(r, vr, vpe, nasrip)
 	// 更新在线信息
-	err := s.Manager.GetRadiusManager().UpdateRadiusOnline(online)
+	err := s.Manager.GetRadiusManager().UpdateRadiusOnlineData(online)
 	if err != nil {
 		radlog.Errorf("UpdateRadiusOnlineData user:%s error, %s", username, err.Error())
 	}

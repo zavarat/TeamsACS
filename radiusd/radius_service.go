@@ -60,9 +60,9 @@ func (s *RadiusService) RADIUSSecret(ctx context.Context, remoteAddr net.Addr) (
 // 查询 NAS 设备, 优先查询IP, 然后ID
 func (s *RadiusService) GetNas(ip, identifier string) (*models.Vpe, error) {
 	vstore := s.Manager.GetVpeManager()
-	vpe, err := vstore.FindVpeByIpaddr(ip)
+	vpe, err := vstore.GetVpeByIpaddr(ip)
 	if err != nil {
-		nvpe, err := vstore.FindVpeByIdentifier(identifier)
+		nvpe, err := vstore.GetVpeByIdentifier(identifier)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				return nil, fmt.Errorf("Unauthorized access to device, Ip=%s, Identifier=%s, %s", ip, identifier, err.Error())

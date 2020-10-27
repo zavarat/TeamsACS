@@ -1,14 +1,30 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package web
 
 import (
 	"fmt"
+	"html"
 	"net/http"
 	"strconv"
 
-	"github.com/360EntSecGroup-Skylar/excelize"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
 
-	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/config"
 	"github.com/ca17/teamsacs/models"
 )
@@ -19,8 +35,6 @@ type RestResult struct {
 	Msg     string      `json:"msg"`
 	Data    interface{} `json:"data"`
 }
-
-
 
 type WebContext struct {
 	Manager *models.ModelManager
@@ -104,45 +118,39 @@ func (h *HttpHandler) ParseFormInt64(c echo.Context, name string) (int64, error)
 
 }
 
-
-
-func (h *HttpHandler) FetchExcelData(c echo.Context, sheet string) ([]map[string]string, error) {
-
-	file, err := c.FormFile("upload")
-	if err != nil {
-		return nil, err
-	}
-	src, err := file.Open()
-	if err != nil {
-		return nil, err
-	}
-	defer src.Close()
-
-	f, err := excelize.OpenReader(src)
-	if err != nil {
-		return nil, err
-	}
-	// 获取 Sheet1 上所有单元格
-	rows := f.GetRows(sheet)
-	head := make(map[int]string)
-	var data []map[string]string
-	for i, row := range rows {
-		item := make(map[string]string)
-		for k, colCell := range row {
-			if i == 0 {
-				head[k] = colCell
-			} else {
-				item[common.ToCamelCase(head[k])] = colCell
-			}
-		}
-		if i == 0 {
-			continue
-		}
-		data = append(data, item)
-	}
-
-	return data, nil
+func (h *HttpHandler) GetJwtData(c echo.Context) jwt.MapClaims {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	return claims
 }
+
+// Get current api user name
+func (h *HttpHandler) GetUsername(c echo.Context) string {
+	jd := h.GetJwtData(c)
+	username, _ := jd["usr"]
+	return username.(string)
+}
+
+// Get current api user level
+func (h *HttpHandler) GetUserLevel(c echo.Context) string {
+	jd := h.GetJwtData(c)
+	level, _ := jd["lvl"]
+	return level.(string)
+}
+
+// Get current api user id
+func (h *HttpHandler) GetUserId(c echo.Context) string {
+	jd := h.GetJwtData(c)
+	uid, _ := jd["uid"]
+	return uid.(string)
+}
+
+// Adding operational logs for audit
+func (h *HttpHandler) AddOpsLog(c echo.Context, desc string)  {
+	jd := h.GetJwtData(c)
+	h.GetManager().GetOpsManager().AddOpsLog(jd["usr"].(string), c.RealIP(), c.Path(), html.EscapeString(desc))
+}
+
 
 type HTTPError struct {
 	Code     int         `json:"-"`
