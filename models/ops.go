@@ -92,7 +92,17 @@ func (m *OpsManager) UpdateApiSecret(username string) (string, error) {
 func (m *OpsManager) UpdateOperator(operator *Operator) error {
 	coll := m.GetTeamsAcsCollection(TeamsacsOperator)
 	query := bson.M{"username": operator.Username}
-	update := bson.M{"$set": operator}
+	data := bson.M{}
+	if common.InSlice(operator.Level, []string{constant.NBIAdminLevel,constant.NBIOprLevel}) {
+		data["level"] = operator.Level
+	}
+	if common.InSlice(operator.Status, []string{constant.ENABLED,constant.DISABLED}) {
+		data["status"] = operator.Status
+	}
+	data["email"] = operator.Email
+	data["remark"] = operator.Remark
+
+	update := bson.M{"$set": data}
 	_, err := coll.UpdateOne(context.TODO(), query, update)
 	return err
 }

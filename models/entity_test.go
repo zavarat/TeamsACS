@@ -24,6 +24,22 @@ import (
 	"github.com/ca17/teamsacs/common"
 )
 
+func TestOperator2json(t *testing.T) {
+	item := &Operator{
+		ID:        common.UUID(),
+		Email:     "test@teamsacs.com",
+		Username:  "opr",
+		Level:     "opr",
+		Remark:    "opr",
+	}
+	bs, err := json.MarshalIndent(item, "", "\t")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(string(bs))
+
+}
+
 func TestCpe2json(t *testing.T) {
 	cpe := &Cpe{
 		Id:         common.UUID(),
@@ -33,7 +49,7 @@ func TestCpe2json(t *testing.T) {
 		CreateTime: time.Now(),
 		UpdateTime: time.Now(),
 	}
-	bs, err := json.Marshal(cpe)
+	bs, err := json.MarshalIndent(cpe, "", "\t")
 	if err != nil {
 		t.Fatal(err)
 	}
