@@ -7,7 +7,7 @@ require (
 	github.com/ahmetb/go-linq v3.0.0+incompatible
 	github.com/allegro/bigcache v1.2.1
 	github.com/bwmarrin/snowflake v0.3.0
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-co-op/gocron v0.1.1
 	github.com/go-ldap/ldap/v3 v3.2.4
 	github.com/go-sql-driver/mysql v1.5.0
@@ -21,6 +21,7 @@ require (
 	github.com/orcaman/concurrent-map v0.0.0-20190826125027-8c72a8bb44f6
 	github.com/pkg/errors v0.9.1
 	github.com/vmihailenco/msgpack/v4 v4.3.9
+	go.elastic.co/apm/module/apmechov4 v1.8.0
 	go.mongodb.org/mongo-driver v1.4.2
 	golang.org/x/image v0.0.0-20200119044424-58c23975cae1
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e

@@ -14,7 +14,7 @@
  *
  */
 
-package web
+package nbi
 
 import (
 	"fmt"
@@ -34,7 +34,7 @@ import (
 )
 
 // 运行管理系统
-func ListenAdminServer(manager *models.ModelManager) error {
+func ListenNBIServer(manager *models.ModelManager) error {
 	e := echo.New()
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
@@ -42,14 +42,15 @@ func ListenAdminServer(manager *models.ModelManager) error {
 	}))
 	e.Use(ServerRecover(manager.Config.Web.Debug))
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format: "admin ${time_rfc3339} ${remote_ip} ${method} ${uri} ${protocol} ${status} ${id} ${user_agent} ${latency} ${bytes_in} ${bytes_out} ${error}\n",
+		Format: "nbi ${time_rfc3339} ${remote_ip} ${method} ${uri} ${protocol} ${status} ${id} ${user_agent} ${latency} ${bytes_in} ${bytes_out} ${error}\n",
 		Output: os.Stdout,
 	}))
 	manager.WebJwtConfig = &middleware.JWTConfig{
 		SigningMethod: middleware.AlgorithmHS256,
 		SigningKey:    []byte(manager.Config.Web.JwtSecret),
 		Skipper: func(c echo.Context) bool {
-			if strings.HasPrefix(c.Path(), "/api/status") || strings.HasPrefix(c.Path(), "/api/token") {
+			if strings.HasPrefix(c.Path(), "/nbi/status") ||
+				strings.HasPrefix(c.Path(), "/nbi/token") {
 				return true
 			}
 			return false
@@ -69,17 +70,12 @@ func ListenAdminServer(manager *models.ModelManager) error {
 
 	manager.TplRender = tpl.NewCommonTemplate([]string{"/resources/templates"}, manager.Dev, manager.GetTemplateFuncMap())
 	e.Renderer = manager.TplRender
-	e.Pre(middleware.Rewrite(map[string]string{
-		"/freeradius/*": "/api/freeradius/$1",
-		"/favicon.ico":  "/static/favicon.ico",
-	}))
-
 	e.HideBanner = true
 	e.Logger.SetLevel(common.If(manager.Config.Web.Debug, elog.DEBUG, elog.INFO).(elog.Lvl))
 	e.Debug = manager.Config.Web.Debug
 	log.Info("try start tls web server")
 	err := e.StartTLS(fmt.Sprintf("%s:%d", manager.Config.Web.Host, manager.Config.Web.Port),
-		path.Join(manager.Config.GetPrivateDir(), "teamsacs-web.tls.crt"), path.Join(manager.Config.GetPrivateDir(), "teamsacs-web.tls.key"))
+		path.Join(manager.Config.GetPrivateDir(), "teamsacs-nbi.tls.crt"), path.Join(manager.Config.GetPrivateDir(), "teamsacs-nbi.tls.key"))
 	if err != nil {
 		log.Warningf("start tls server error %s", err)
 		log.Info("start web server")

@@ -8,7 +8,6 @@ import (
 	"runtime"
 	"time"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"gopkg.in/go-playground/pool.v3"
 	"layeh.com/radius"
 	"layeh.com/radius/rfc2865"
@@ -97,14 +96,14 @@ func (s *RadiusService) GetUser(username string, macauth bool) (*models.Subscrib
 		return nil, fmt.Errorf("user:%s status is disabled", username)
 	}
 
-	if user.ExpireTime.Time().Before(time.Now()) {
+	if user.ExpireTime.Before(time.Now()) {
 		return nil, fmt.Errorf("user:%s expire", username)
 	}
 	return user, nil
 }
 
 // 获取Ldap 服务节点新
-func (s *RadiusService) GetLdap(id primitive.ObjectID) (*models.Ldap, error) {
+func (s *RadiusService) GetLdap(id string) (*models.Ldap, error) {
 	m := s.Manager.GetLdapManager()
 	ld, err := m.FindLdapById(id)
 	if err != nil {
@@ -207,8 +206,8 @@ func GetRadiusOnlineFromRequest(r *radius.Request, vr *radparser.VendorRequest, 
 		AcctOutputTotal:   int64(acctOutputOctets) + int64(acctOutputGigawords)*4*1024*1024*1024,
 		AcctInputPackets:  int(rfc2866.AcctInputPackets_Get(r.Packet)),
 		AcctOutputPackets: int(rfc2866.AcctInputPackets_Get(r.Packet)),
-		AcctStartTime:     primitive.NewDateTimeFromTime(getAcctStartTime(int(rfc2866.AcctSessionTime_Get(r.Packet)))),
-		LastUpdate:        primitive.NewDateTimeFromTime(time.Now()),
+		AcctStartTime:     getAcctStartTime(int(rfc2866.AcctSessionTime_Get(r.Packet))),
+		LastUpdate:        time.Now(),
 	}
 
 }

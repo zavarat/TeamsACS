@@ -14,17 +14,21 @@
  *
  */
 
-package web
+package nbi
 
 import (
+	"encoding/json"
 	"fmt"
 	"html"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
 
+	"github.com/ca17/teamsacs/common"
+	"github.com/ca17/teamsacs/common/web"
 	"github.com/ca17/teamsacs/config"
 	"github.com/ca17/teamsacs/models"
 )
@@ -150,6 +154,40 @@ func (h *HttpHandler) AddOpsLog(c echo.Context, desc string)  {
 	jd := h.GetJwtData(c)
 	h.GetManager().GetOpsManager().AddOpsLog(jd["usr"].(string), c.RealIP(), c.Path(), html.EscapeString(desc))
 }
+
+func (h *HttpHandler) JsonBodyParse(c echo.Context) (web.RequestParams, error)  {
+	body, err := ioutil.ReadAll(c.Request().Body)
+	if err != nil {
+		return nil, err
+	}
+	query := make(web.RequestParams)
+	err = json.Unmarshal(body, &query)
+	return query, err
+}
+
+func (h *HttpHandler) RequestParseGet(c echo.Context) web.RequestParams {
+	query := make(web.RequestParams)
+	for k, vs := range c.QueryParams() {
+		query[k] = vs[0]
+	}
+	return query
+}
+
+
+func (h *HttpHandler) RequestParse(c echo.Context) web.RequestParams {
+	var params = web.EmptyRequestParams
+	var err error
+	switch c.Request().Method {
+	case http.MethodGet:
+		params = h.RequestParseGet(c)
+	case http.MethodPost, http.MethodPut:
+		params, err = h.JsonBodyParse(c)
+		common.Must(err)
+	}
+	return params
+}
+
+
 
 
 type HTTPError struct {

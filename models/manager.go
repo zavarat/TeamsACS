@@ -86,6 +86,12 @@ func NewModelManager(appconfig *config.AppConfig, dev bool) *ModelManager {
 
 func (m *ModelManager) registerManagers()  {
 	m.ManagerMap.Set("SubscribeManager", &SubscribeManager{m})
+	m.ManagerMap.Set("RadiusManager", &RadiusManager{m})
+	m.ManagerMap.Set("VpeManager", &VpeManager{m})
+	m.ManagerMap.Set("OpsManager", &OpsManager{m})
+	m.ManagerMap.Set("CpeManager", &CpeManager{m})
+	m.ManagerMap.Set("ConfigManager", &ConfigManager{m})
+	m.ManagerMap.Set("GenieacsManager", &GenieacsManager{m})
 }
 
 

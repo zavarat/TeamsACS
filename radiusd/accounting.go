@@ -32,7 +32,7 @@ func (s *AcctService) processAcctUpdateBefore(r *radius.Request, vr *radparser.V
 	}
 
 	// 用户过期后触发下线
-	if user.ExpireTime.Time().Before(time.Now()) {
+	if user.ExpireTime.Before(time.Now()) {
 		s.processAcctDisconnect(r, vpe, user.Username, nasrip)
 	}
 

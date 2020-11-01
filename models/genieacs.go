@@ -36,7 +36,7 @@ func (m *ModelManager) GetGenieacsManager() *GenieacsManager {
 }
 
 // query device info by cpesn
-func (m *ModelManager) QueryMikrotikDeviceInfo() ([]mikrotik.DeviceInfo, error) {
+func (m *GenieacsManager) QueryMikrotikDeviceInfo() ([]mikrotik.DeviceInfo, error) {
 	items, err := m.QueryMikrotikSourceData("")
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func (m *ModelManager) QueryMikrotikDeviceInfo() ([]mikrotik.DeviceInfo, error) 
 }
 
 // query DNSServer by cpe sn
-func (m *ModelManager) QueryMikrotikDnsServer(sn string) (*mikrotik.DnsClientServer, error) {
+func (m *GenieacsManager) QueryMikrotikDnsServer(sn string) (*mikrotik.DnsClientServer, error) {
 	items, err := m.QueryMikrotikSourceData(sn)
 	if err != nil {
 		return nil, err
@@ -94,7 +94,7 @@ func (m *ModelManager) QueryMikrotikDnsServer(sn string) (*mikrotik.DnsClientSer
 }
 
 // query routers bu cpe sn
-func (m *ModelManager) QueryMikrotikRouters(sn string) (*mikrotik.DeviceRouter, error) {
+func (m *GenieacsManager) QueryMikrotikRouters(sn string) (*mikrotik.DeviceRouter, error) {
 	items, err := m.QueryMikrotikSourceData(sn)
 	if err != nil {
 		return nil, err
@@ -128,7 +128,7 @@ func (m *ModelManager) QueryMikrotikRouters(sn string) (*mikrotik.DeviceRouter, 
 }
 
 // query all ethernet by cpe sn
-func (m *ModelManager) QueryMikrotikEthernetInterface(sn string) (*mikrotik.EthernetInterface, error) {
+func (m *GenieacsManager) QueryMikrotikEthernetInterface(sn string) (*mikrotik.EthernetInterface, error) {
 	items, err := m.QueryMikrotikSourceData(sn)
 	if err != nil {
 		return nil, err
@@ -161,7 +161,7 @@ func (m *ModelManager) QueryMikrotikEthernetInterface(sn string) (*mikrotik.Ethe
 }
 
 // query all ppp interface by cpe sn
-func (m *ModelManager) QueryMikrotikPPPInterface(sn string) (*mikrotik.PPPInterface, error) {
+func (m *GenieacsManager) QueryMikrotikPPPInterface(sn string) (*mikrotik.PPPInterface, error) {
 	items, err := m.QueryMikrotikSourceData(sn)
 	if err != nil {
 		return nil, err
@@ -194,7 +194,7 @@ func (m *ModelManager) QueryMikrotikPPPInterface(sn string) (*mikrotik.PPPInterf
 }
 
 // query all ethernet by cpe sn
-func (m *ModelManager) QueryMikrotikIpInterface(sn string) (*mikrotik.IpInterface, error) {
+func (m *GenieacsManager) QueryMikrotikIpInterface(sn string) (*mikrotik.IpInterface, error) {
 	items, err := m.QueryMikrotikSourceData(sn)
 	if err != nil {
 		return nil, err
@@ -230,7 +230,7 @@ func (m *ModelManager) QueryMikrotikIpInterface(sn string) (*mikrotik.IpInterfac
 }
 
 // query all cpe data
-func (m *ModelManager) QueryMikrotikSourceData(sn string) ([]map[string]interface{}, error) {
+func (m *GenieacsManager) QueryMikrotikSourceData(sn string) ([]map[string]interface{}, error) {
 	findOptions := options.Find()
 	findOptions.SetLimit(100)
 	coll := m.GetGenieAcsCollection(GenieacsDevices)

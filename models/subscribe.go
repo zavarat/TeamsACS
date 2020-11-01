@@ -18,9 +18,13 @@ package models
 
 import (
 	"context"
+	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+
+	"github.com/ca17/teamsacs/common"
+	"github.com/ca17/teamsacs/common/web"
+	"github.com/ca17/teamsacs/constant"
 )
 
 type SubscribeManager struct{ *ModelManager }
@@ -30,9 +34,15 @@ func (m *ModelManager) GetSubscribeManager() *SubscribeManager {
 	return store.(*SubscribeManager)
 }
 
+// QuerySubscribes
+func (m *SubscribeManager) QuerySubscribes(params web.RequestParams) (*web.PageResult, error) {
+	return m.QueryPagerItems(params, TeamsacsSubscribe)
+}
+
+// GetSubscribeByUser
 func (m *SubscribeManager) GetSubscribeByUser(username string) (*Subscribe, error) {
 	coll := m.GetTeamsAcsCollection(TeamsacsSubscribe)
-	doc := coll.FindOne(context.TODO(), bson.M{"username":username})
+	doc := coll.FindOne(context.TODO(), bson.M{"username": username})
 	err := doc.Err()
 	if err != nil {
 		return nil, err
@@ -42,10 +52,10 @@ func (m *SubscribeManager) GetSubscribeByUser(username string) (*Subscribe, erro
 	return result, err
 }
 
-
+// GetSubscribeByMac
 func (m *SubscribeManager) GetSubscribeByMac(mac string) (*Subscribe, error) {
 	coll := m.GetTeamsAcsCollection(TeamsacsSubscribe)
-	doc := coll.FindOne(context.TODO(), bson.M{"macaddr":mac})
+	doc := coll.FindOne(context.TODO(), bson.M{"macaddr": mac})
 	err := doc.Err()
 	if err != nil {
 		return nil, err
@@ -55,17 +65,54 @@ func (m *SubscribeManager) GetSubscribeByMac(mac string) (*Subscribe, error) {
 	return result, err
 }
 
-
-func (m *SubscribeManager) UpdateSubscribeByUsername(username string, valmap map[string]interface{})  error {
+// UpdateSubscribeByUsername
+func (m *SubscribeManager) UpdateSubscribeByUsername(username string, valmap map[string]interface{}) error {
 	coll := m.GetTeamsAcsCollection(TeamsacsSubscribe)
-	_, err := coll.UpdateOne(context.TODO(), bson.M{"username":username}, valmap)
+	_, err := coll.UpdateOne(context.TODO(), bson.M{"username": username}, valmap)
 	return err
 }
 
+// ExistSubscribe
+func (m *SubscribeManager) ExistSubscribe(username string) bool {
+	coll := m.GetTeamsAcsCollection(TeamsacsSubscribe)
+	count, _ := coll.CountDocuments(context.TODO(), bson.M{"username": username})
+	return count > 0
+}
+
+// UpdateSubscribe
+// update by username
+func (m *SubscribeManager) UpdateSubscribe(subscribe *Subscribe) error {
+	if err := subscribe.UpdateValidate(); err != nil {
+		return err
+	}
+	coll := m.GetTeamsAcsCollection(TeamsacsSubscribe)
+	query := bson.M{"username": subscribe.Username}
+	update := bson.M{"$set": subscribe}
+	_, err := coll.UpdateOne(context.TODO(), query, update)
+	return err
+}
+
+// AddSubscribe
 func (m *SubscribeManager) AddSubscribe(subs *Subscribe) (string, error) {
+	if err := subs.AddValidate(); err != nil {
+		return "", err
+	}
+	if m.ExistSubscribe(subs.Username) {
+		return "", fmt.Errorf("subscribe exists")
+	}
+	subs.Status = constant.ENABLED
 	r, err := m.GetTeamsAcsCollection(TeamsacsSubscribe).InsertOne(context.TODO(), subs)
 	if err != nil {
 		return "", err
 	}
-	return r.InsertedID.(primitive.ObjectID).Hex(), err
+	return r.InsertedID.(string), err
+}
+
+// DeleteSubscribe
+func (m *SubscribeManager) DeleteSubscribe(username string) error {
+	if common.IsEmptyOrNA(username) {
+		return fmt.Errorf("username is empty or NA")
+	}
+	_, err := m.GetTeamsAcsCollection(TeamsacsSubscribe).DeleteOne(context.TODO(), bson.M{"username": username})
+	return err
 }

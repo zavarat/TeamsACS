@@ -29,11 +29,12 @@ import (
 	"github.com/ca17/teamsacs/common/installer"
 	"github.com/ca17/teamsacs/common/log"
 	"github.com/ca17/teamsacs/config"
+	"github.com/ca17/teamsacs/freeradius"
 	"github.com/ca17/teamsacs/grpcservice"
 	"github.com/ca17/teamsacs/models"
+	"github.com/ca17/teamsacs/nbi"
 	"github.com/ca17/teamsacs/radiusd"
 	"github.com/ca17/teamsacs/radiusd/radlog"
-	"github.com/ca17/teamsacs/web"
 )
 
 var (
@@ -54,17 +55,20 @@ var (
 
 // Command line definition
 var (
-	h          = flag.Bool("h", false, "help usage")
-	showVer    = flag.Bool("v", false, "show version")
-	debug      = flag.Bool("X", false, "run debug level")
-	syslogaddr = flag.String("syslog", "", "syslog addr x.x.x.x:x")
-	conffile   = flag.String("c", "/etc/teamsacs.yaml", "config yaml/json file")
-	dev        = flag.Bool("dev", false, "run develop mode")
-	port       = flag.Int("p", 0, "web port")
-	install    = flag.Bool("install", false, "run install")
-	uninstall  = flag.Bool("uninstall", false, "run uninstall")
-	initcfg    = flag.Bool("initcfg", false, "write default config > /etc/teamsacs.yaml")
-	initSuper  = flag.Bool("initsuper", false, "init super password to 'Teams@Acs' ")
+	h               = flag.Bool("h", false, "help usage")
+	showVer         = flag.Bool("v", false, "show version")
+	debug           = flag.Bool("X", false, "run debug level")
+	syslogaddr      = flag.String("syslog", "", "syslog addr x.x.x.x:x")
+	conffile        = flag.String("c", "/etc/teamsacs.yaml", "config yaml/json file")
+	dev             = flag.Bool("dev", false, "run develop mode")
+	port            = flag.Int("p", 0, "web port")
+	install         = flag.Bool("install", false, "run install")
+	startFreeradius = flag.Bool("freeradius", true, "run freeradius api")
+	startNbi        = flag.Bool("nbiservice", true, "run northbound interface api")
+	startSbi        = flag.Bool("sbiservice", true, "run southbound interface api")
+	uninstall       = flag.Bool("uninstall", false, "run uninstall")
+	initcfg         = flag.Bool("initcfg", false, "write default config > /etc/teamsacs.yaml")
+	initSuper       = flag.Bool("initsuper", false, "init super password to 'Teams@Acs' ")
 )
 
 // Print version information
@@ -176,7 +180,6 @@ func main() {
 		return
 	}
 
-
 	manager := models.NewModelManager(appconfig, *dev)
 
 	if *initSuper {
@@ -200,14 +203,25 @@ func main() {
 	time.Sleep(time.Millisecond * 50)
 
 	g.Go(func() error {
-		log.Info("Start Admin Server ...")
-		return web.ListenAdminServer(manager)
-	})
-
-	g.Go(func() error {
 		log.Info("Start Grpc Server ...")
 		return grpcservice.StartGrpcServer(manager)
 	})
+
+	if *startFreeradius {
+		g.Go(func() error {
+			log.Info("Start FreeRADIUS API Server ...")
+			return freeradius.ListenFreeRADIUSServer(manager)
+		})
+	}
+
+	time.Sleep(time.Millisecond * 50)
+
+	if *startNbi {
+		g.Go(func() error {
+			log.Info("Start NBI Server ...")
+			return nbi.ListenNBIServer(manager)
+		})
+	}
 
 	time.Sleep(time.Millisecond * 50)
 

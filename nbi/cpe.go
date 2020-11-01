@@ -14,7 +14,7 @@
  *
  */
 
-package web
+package nbi
 
 import (
 	"fmt"
@@ -23,13 +23,14 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/ca17/teamsacs/common"
-	"github.com/ca17/teamsacs/common/web"
+	"github.com/ca17/teamsacs/models"
 )
 
 // QueryCpe
 func (h *HttpHandler) QueryCpe(c echo.Context) error {
 	var result = make(map[string]interface{})
-	data, err := h.GetManager().GetCpeManager().QueryCpes(web.NewWebForm(c))
+	params := h.RequestParse(c)
+	data, err := h.GetManager().GetCpeManager().QueryCpes(params)
 	if err != nil {
 		return h.GetInternalError(err)
 	}
@@ -37,9 +38,14 @@ func (h *HttpHandler) QueryCpe(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-
 func (h *HttpHandler) AddCpe(c echo.Context) error {
-	err := h.GetManager().GetCpeManager().AddCpe(web.NewWebForm(c))
+	item := new(models.Cpe)
+	common.Must(c.Bind(item))
+	if common.IsEmptyOrNA(item.Sn) {
+		common.Must(fmt.Errorf("sn is empty or NA"))
+	}
+
+	err := h.GetManager().GetCpeManager().AddCpe(item)
 	if err != nil {
 		return h.GetInternalError(err)
 	}
@@ -47,21 +53,18 @@ func (h *HttpHandler) AddCpe(c echo.Context) error {
 	return c.JSON(200, h.RestSucc("Success"))
 }
 
-
-func (h *HttpHandler) UpdateCpeAttrs(c echo.Context) error {
-	form := web.NewWebForm(c)
-	err := h.GetManager().GetCpeManager().UpdateCpeAttrs(form)
+func (h *HttpHandler) UpdateCpe(c echo.Context) error {
+	params := h.RequestParse(c)
+	err := h.GetManager().GetCpeManager().UpdateCpe(params)
 	common.Must(err)
-	h.AddOpsLog(c, fmt.Sprintf("Update CPE sn=%s", form.GetVal("sn")))
+	h.AddOpsLog(c, fmt.Sprintf("Update CPE sn=%s", params.GetString("sn")))
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }
 
-
 func (h *HttpHandler) DeleteCpe(c echo.Context) error {
-	sn := c.QueryParam("sn")
+	params := h.RequestParse(c)
+	sn := params.GetMustString("sn")
 	common.Must(h.GetManager().GetCpeManager().DeleteCpe(sn))
 	h.AddOpsLog(c, fmt.Sprintf("Delete CPE sn=%s", sn))
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }
-
-

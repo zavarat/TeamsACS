@@ -14,7 +14,7 @@
  *
  */
 
-package web
+package freeradius
 
 import (
 	"fmt"
@@ -37,6 +37,13 @@ const (
 	RadiusInterimIntelval   = 120
 	RadiusAuthlogLevel      = "all"
 )
+
+func (h *HttpHandler) InitAllRouter(e *echo.Echo) {
+	e.Add(http.MethodPost, "/freeradius/authorize", h.FreeradiusAuthorize)
+	e.Add(http.MethodPost, "/freeradius/authenticate", h.FreeradiusAuthenticate)
+	e.Add(http.MethodPost, "/freeradius/postauth", h.FreeradiusPostauth)
+	e.Add(http.MethodPost, "/freeradius/accounting", h.FreeradiusAccounting)
+}
 
 // 添加认证日志
 func (h *HttpHandler) AddAuthlog(username string, nasip string, result string, reason string, level string, cast int64) {
@@ -78,7 +85,7 @@ func (h *HttpHandler) FreeradiusAuthorize(c echo.Context) error {
 	}
 
 	// Check user expiration
-	if user.ExpireTime.Time().Before(time.Now()) {
+	if user.ExpireTime.Before(time.Now()) {
 		h.AddAuthlog(username, nasip, RadiusAuthFailure, "user expire", RadiusAuthlogLevel, time.Since(start).Milliseconds())
 		return c.JSON(501, echo.Map{"Reply-Message": "user expire, reject auth"})
 	}
@@ -99,7 +106,7 @@ func (h *HttpHandler) FreeradiusAuthorize(c echo.Context) error {
 	resp := map[string]interface{}{}
 	resp["control:Cleartext-Password"] = strings.TrimSpace(user.Password)
 	resp["reply:Mikrotik-Rate-Limit"] = fmt.Sprintf("%dk/%dk", user.Profile.UpRate, user.Profile.DownRate)
-	sessionTimeout := user.ExpireTime.Time().Sub(time.Now()).Seconds()
+	sessionTimeout := user.ExpireTime.Sub(time.Now()).Seconds()
 	resp["reply:Session-Timeout"] = fmt.Sprintf("%d", int64(sessionTimeout))
 
 	// Set address pool or static IP

@@ -42,7 +42,7 @@ func (m *RadiusManager) AddRadiusAuthLog(username string, nasip string, result s
 		Result:    result,
 		Reason:    reason,
 		Cast:      int(cast),
-		Timestamp: primitive.NewDateTimeFromTime(time.Now()),
+		Timestamp: time.Now(),
 	}
 	coll := m.GetTeamsAcsCollection(TeamsacsAuthlog)
 	_, err := coll.InsertOne(context.TODO(), authlog)
@@ -68,7 +68,7 @@ func (m *RadiusManager) AddRadiusOnline(ol Accounting) error {
 }
 
 func (m *RadiusManager) AddRadiusAccounting(acct Accounting) error {
-	acct.AcctStopTime = primitive.NewDateTimeFromTime(time.Now())
+	acct.AcctStopTime = time.Now()
 	_, err := m.GetTeamsAcsCollection(TeamsacsAccounting).InsertOne(context.TODO(), acct)
 	return err
 }
@@ -141,8 +141,8 @@ func (m *RadiusManager) UpdateRadiusOnline(form *web.WebForm) error {
 		AcctOutputTotal:   getOutputTotal(form),
 		AcctInputPackets:  form.GetIntVal("acctInputPackets", 0),
 		AcctOutputPackets: form.GetIntVal("acctOutputPackets", 0),
-		AcctStartTime:     primitive.NewDateTimeFromTime(getAcctStartTime(form.GetVal2("acctSessionTime", "0"))),
-		LastUpdate:        primitive.NewDateTimeFromTime(time.Now()),
+		AcctStartTime:     getAcctStartTime(form.GetVal2("acctSessionTime", "0")),
+		LastUpdate:       time.Now(),
 	}
 	switch statusType {
 	case "Start", "Update", "Alive", "Interim-Update":

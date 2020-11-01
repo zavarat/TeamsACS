@@ -64,7 +64,7 @@ func (s *AuthService) ServeRADIUS(w radius.ResponseWriter, r *radius.Request) {
 
 	// ----------------------------------------------------------------------------------------------------
 	// Ldap auth
-	if vpe.LdapId.IsZero(){
+	if vpe.LdapId == ""{
 		lnode, err := s.GetLdap(vpe.LdapId)
 		s.CheckRadAuthError(start, username, ip, err)
 		// check ldap auth

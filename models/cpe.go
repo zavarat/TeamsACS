@@ -19,13 +19,9 @@ package models
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/x/bsonx"
 
 	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/common/web"
@@ -62,76 +58,38 @@ func (m *CpeManager) GetCpeBySn(sn string) (*Cpe, error) {
 	return result, err
 }
 
-func (m *CpeManager) QueryCpes(form *web.WebForm) (*web.PageResult, error) {
-	var findOptions = options.Find()
-	var pos = form.GetInt64Val("start", 0)
-	findOptions.SetSkip(pos)
-	findOptions.SetLimit(form.GetInt64Val("count", 40))
-	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
-	var q = bson.M{}
-	for qname, vals := range form.Gets {
-		if !strings.HasPrefix(qname, "attrs.") {
-			continue
-		}
-		q[qname] = vals[0]
-	}
-	cur, err := coll.Find(context.TODO(), q, findOptions)
-	if err != nil {
-		return nil, err
-	}
-	var countOptions = options.Count()
-	total, err := coll.CountDocuments(context.TODO(), q, countOptions)
-	if err != nil {
-		return nil, err
-	}
-	items := make([]map[string]interface{}, 0)
-	for cur.Next(context.TODO()) {
-		var elem map[string]interface{}
-		err := cur.Decode(&elem)
-		if err != nil {
-			fmt.Println(err)
-		} else {
-			items = append(items, elem)
-		}
-	}
-	return &web.PageResult{TotalCount: total, Pos: pos, Data: items}, nil
+func (m *CpeManager) QueryCpes(params web.RequestParams) (*web.PageResult, error) {
+	return m.QueryPagerItems(params, TeamsacsCpe)
 }
 
-func (m *CpeManager) AddCpe(form *web.WebForm) error {
-	sn := form.GetVal("sn")
-	if common.IsEmptyOrNA(sn) {
-		return fmt.Errorf("sn is empty or NA")
-	}
+func (m *CpeManager) ExistCpe(sn string) bool {
 	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
-	cpe := new(Cpe)
-	cpe.Sn = sn
-	cpe.DeviceId = ""
-	cpe.CreateTime = primitive.NewDateTimeFromTime(time.Now())
-	cpe.UpdateTime = primitive.NewDateTimeFromTime(time.Now())
-	cpe.Attrs = bsonx.Doc{}
-	for k, v := range form.Posts {
-		if !strings.HasPrefix(k, "attrs.") {
-			continue
-		}
-		cpe.Attrs.Set(k[6:], bsonx.String(v[0]))
+	count, _ := coll.CountDocuments(context.TODO(), bson.M{"sn": sn})
+	return count > 0
+}
+
+func (m *CpeManager) AddCpe(cpe *Cpe) error {
+	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
+	if m.ExistCpe(cpe.Sn) {
+		return fmt.Errorf("cpe exists")
 	}
+	cpe.CreateTime = time.Now()
+	cpe.UpdateTime = time.Now()
+	cpe.Attrs = make(Attributes)
 	_, err := coll.InsertOne(context.TODO(), cpe)
 	return err
 }
 
-func (m *CpeManager) UpdateCpeAttrs(form *web.WebForm) error {
-	sn := form.GetVal("sn")
+func (m *CpeManager) UpdateCpe(params web.RequestParams) error {
+	sn := params.GetString("sn")
 	if common.IsEmptyOrNA(sn) {
 		return fmt.Errorf("sn is empty or NA")
 	}
 	data := bson.M{
-		"update_time": primitive.NewDateTimeFromTime(time.Now()),
+		"update_time": time.Now(),
 	}
-	for k, v := range form.Posts {
-		if !strings.HasPrefix(k, "attrs.") {
-			continue
-		}
-		data[k] = v[0]
+	for k, v := range params.GetParamMap("attrs") {
+		data["attrs."+k] = v
 	}
 	query := bson.M{"sn": sn}
 	update := bson.M{"$set": data}

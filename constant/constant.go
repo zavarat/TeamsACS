@@ -20,5 +20,8 @@ const (
 	NA = "N/A"
 	ENABLED = "enabled"
 	DISABLED = "disabled"
+
+	NBIAdminLevel = "admin"
+	NBIOprLevel = "opr"
 )
 

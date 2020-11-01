@@ -20,6 +20,7 @@ package web
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/url"
 	"strconv"
 
@@ -154,3 +155,96 @@ var EmptyPageResult = &PageResult{
 	Pos:        0,
 	Data:       common.EmptyList,
 }
+
+type QueryResult []map[string]interface{}
+
+type RequestParams map[string]interface{}
+
+var EmptyRequestParams = make(RequestParams)
+
+func (jp RequestParams) GetString(key string) string {
+	v, ok := jp[key]
+	if !ok {
+		return ""
+	}
+	vv, ok := v.(string)
+	if ok {
+		return vv
+	}
+	return ""
+}
+
+func (jp RequestParams) GetParamMap(key string) RequestParams {
+	v, ok := jp[key]
+	if !ok {
+		return EmptyRequestParams
+	}
+	vv, ok := v.(map[string]interface{})
+	if ok {
+		return vv
+	}
+	return EmptyRequestParams
+}
+
+func (jp RequestParams) GetStringWithDefval(key string, defval string) string {
+	v, ok := jp[key]
+	if !ok {
+		return defval
+	}
+	vv, ok := v.(string)
+	if ok {
+		return vv
+	}
+	return defval
+}
+
+func (jp RequestParams) GetInt64(key string) int64 {
+	v, ok := jp[key]
+	if !ok {
+		return 0
+	}
+	vv, ok := v.(int64)
+	if ok {
+		return vv
+	}
+	return 0
+}
+
+func (jp RequestParams) GetInt64WithDefval(key string, devfval int64) int64 {
+	v, ok := jp[key]
+	if !ok {
+		return devfval
+	}
+	vv, ok := v.(int64)
+	if ok {
+		return vv
+	}
+	return devfval
+}
+
+var NoValueError = fmt.Errorf("no value")
+
+func (jp RequestParams) GetMustString(key string) string {
+	v, ok := jp[key]
+	if !ok {
+		common.Must(NoValueError)
+	}
+	vv, ok := v.(string)
+	if !ok {
+		common.Must(NoValueError)
+	}
+	return vv
+}
+
+func (jp RequestParams) GetMustInt64(key string) int64 {
+	v, ok := jp[key]
+	if !ok {
+		common.Must(NoValueError)
+	}
+	vv, ok := v.(int64)
+	if !ok {
+		common.Must(NoValueError)
+	}
+	return vv
+}
+

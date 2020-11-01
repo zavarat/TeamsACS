@@ -14,7 +14,7 @@
  *
  */
 
-package web
+package nbi
 
 import (
 	"net/http"

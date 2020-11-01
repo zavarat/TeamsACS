@@ -49,6 +49,12 @@ type WebConfig struct {
 	JwtSecret string `yaml:"jwt_secret" json:"jwt_secret"`
 }
 
+type FreeradiusConfig struct {
+	Host  string `yaml:"host" json:"host"`
+	Port  int    `yaml:"port" json:"port"`
+	Debug bool   `yaml:"debug" json:"debug"`
+}
+
 type GrpcConfig struct {
 	Host  string `yaml:"host" json:"host"`
 	Port  int    `yaml:"port" json:"port"`
@@ -63,11 +69,12 @@ type RadiusdConfig struct {
 }
 
 type AppConfig struct {
-	System  SysConfig     `yaml:"system" json:"system"`
-	Web     WebConfig     `yaml:"web" json:"web"`
-	Mongodb MongodbConfig `yaml:"mongodb" json:"mongodb"`
-	Grpc    GrpcConfig    `yaml:"grpc" json:"grpc"`
-	Radiusd RadiusdConfig `yaml:"radiusd" json:"radiusd"`
+	System     SysConfig        `yaml:"system" json:"system"`
+	Web        WebConfig        `yaml:"web" json:"web"`
+	Freeradius FreeradiusConfig `yaml:"freeradius" json:"freeradius"`
+	Mongodb    MongodbConfig    `yaml:"mongodb" json:"mongodb"`
+	Grpc       GrpcConfig       `yaml:"grpc" json:"grpc"`
+	Radiusd    RadiusdConfig    `yaml:"radiusd" json:"radiusd"`
 }
 
 func (c *AppConfig) GetLogDir() string {
@@ -110,17 +117,22 @@ var DefaultAppConfig = &AppConfig{
 		Workdir:    "/var/teamsacs",
 		SyslogAddr: "",
 		Location:   "Asia/Shanghai",
-		Aeskey: "5f8923be3da19452d3acdc9e69fa24e6",
+		Aeskey:     "5f8923be3da19452d3acdc9e69fa24e6",
 	},
 	Web: WebConfig{
 		Host:      "0.0.0.0",
-		Port:      18998,
+		Port:      20991,
 		Debug:     true,
 		JwtSecret: "9b6de5cc07384bf1acs10f568ac9da37",
 	},
+	Freeradius: FreeradiusConfig{
+		Host:      "0.0.0.0",
+		Port:      20992,
+		Debug:     true,
+	},
 	Grpc: GrpcConfig{
 		Host:  "0.0.0.0",
-		Port:  18999,
+		Port:  20993,
 		Debug: true,
 	},
 	Radiusd: RadiusdConfig{
@@ -177,6 +189,16 @@ func LoadConfig(cfile string) *AppConfig {
 	})
 	setEnvInt64Value("TEAMSACS_WEB_PORT", func(v int64) {
 		cfg.Web.Port = int(v)
+	})
+
+	setEnvValue("TEAMSACS_FREERADIUS_WEB_HOST", func(v string) {
+		cfg.Freeradius.Host = v
+	})
+	setEnvValue("TEAMSACS_FREERADIUS_WEB_DEBUG", func(v string) {
+		cfg.Freeradius.Debug = v == "true"
+	})
+	setEnvInt64Value("TEAMSACS_FREERADIUS_WEB_PORT", func(v int64) {
+		cfg.Freeradius.Port = int(v)
 	})
 
 	setEnvValue("TEAMSACS_MONGODB_URL", func(v string) {

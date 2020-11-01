@@ -1,0 +1,6 @@
+POST http://{{freeradius_url}}/freeradius/authorize
+Content-Type: application/x-www-form-urlencoded
+
+username=test01&nasip=127.0.0.1&nasid=tradtest
+
+###
