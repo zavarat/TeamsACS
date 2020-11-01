@@ -39,6 +39,8 @@ func (a *Subscribe) UpdateValidate() error {
 	return nil
 }
 
+
+
 func (a *Vpe) AddValidate() error {
 	switch {
 	case common.IsEmptyOrNA(a.Sn):

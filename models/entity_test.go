@@ -40,6 +40,30 @@ func TestOperator2json(t *testing.T) {
 
 }
 
+func TestVpe2json(t *testing.T) {
+	item := &Vpe{
+		ID:         common.UUID(),
+		Sn:         "yyyyyy",
+		DeviceId:   "",
+		Attrs:      nil,
+		Identifier: "tradtest",
+		Name:       "tradtest",
+		Ipaddr:     "ipaddr",
+		Secret:     "secret",
+		VendorCode: "vendor_code",
+		CoaPort:    3799,
+		Status:     "enabled",
+		LdapId:     "",
+		Remark:     "",
+	}
+	bs, err := json.MarshalIndent(item, "", "\t")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(string(bs))
+
+}
+
 func TestCpe2json(t *testing.T) {
 	cpe := &Cpe{
 		Id:         common.UUID(),

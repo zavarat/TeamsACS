@@ -24,17 +24,23 @@ import (
 
 func (h *HttpHandler) InitAllRouter(e *echo.Echo) {
 	// mikrotik cpe query apis
-	e.Any("/nbi/cpe/mikrotik/device/interfaces", h.QueryMikrotikDeviceInterfaces)
-	e.Any("/nbi/cpe/mikrotik/device/pppinterfaces", h.QueryMikrotikDevicePPPInterfaces)
-	e.Any("/nbi/cpe/mikrotik/device/ipinterfaces", h.QueryMikrotikDeviceIpInterfaces)
-	e.Any("/nbi/cpe/mikrotik/device/routers", h.QueryMikrotikDeviceRouters)
-	e.Any("/nbi/cpe/mikrotik/device/dns", h.QueryMikrotikDeviceDnsClientServer)
+	e.Any("/nbi/mikrotik/device/interfaces", h.QueryMikrotikDeviceInterfaces)
+	e.Any("/nbi/mikrotik/device/pppinterfaces", h.QueryMikrotikDevicePPPInterfaces)
+	e.Any("/nbi/mikrotik/device/ipinterfaces", h.QueryMikrotikDeviceIpInterfaces)
+	e.Any("/nbi/mikrotik/device/routers", h.QueryMikrotikDeviceRouters)
+	e.Any("/nbi/mikrotik/device/dns", h.QueryMikrotikDeviceDnsClientServer)
 
 	// Cpe apis
 	e.Any("/nbi/cpe/query", h.QueryCpe)
 	e.Add(http.MethodPost, "/nbi/cpe/add", h.AddCpe)
 	e.Add(http.MethodPost, "/nbi/cpe/update", h.UpdateCpe)
 	e.Any("/nbi/cpe/delete", h.DeleteCpe)
+
+	// Vpe apis
+	e.Any("/nbi/vpe/query", h.QueryVpe)
+	e.Add(http.MethodPost, "/nbi/vpe/add", h.AddVpe)
+	e.Add(http.MethodPost, "/nbi/vpe/update", h.UpdateVpe)
+	e.Any("/nbi/vpe/delete", h.DeleteVpe)
 
 	// Subscribe apis
 	e.Any("/nbi/subscribe/query", h.QuerySubscribe)
@@ -47,6 +53,11 @@ func (h *HttpHandler) InitAllRouter(e *echo.Echo) {
 	e.Add(http.MethodPost, "/nbi/opr/add",h.AddOperator)
 	e.Add(http.MethodPost, "/nbi/opr/update", h.UpdateOperator)
 	e.Any("/nbi/opr/delete", h.DeleteOperator)
+
+	// radius apis
+	e.Any("/nbi/radius/accounting/query", h.QueryRadiusAccounting)
+	e.Any("/nbi/radius/authlog/query", h.QueryRadiusAuthlog)
+	e.Any("/nbi/radius/online/query", h.QueryRadiusOnline)
 
 	// token
 	e.Add(http.MethodPost, "/nbi/token", h.RequestToken)

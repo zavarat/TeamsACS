@@ -19,7 +19,6 @@ package models
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 
@@ -34,6 +33,12 @@ func (m *ModelManager) GetVpeManager() *VpeManager {
 	store, _ := m.ManagerMap.Get("VpeManager")
 	return store.(*VpeManager)
 }
+
+// QueryVpes
+func (m *VpeManager) QueryVpes(params web.RequestParams) (*web.PageResult, error) {
+	return m.QueryPagerItems(params, TeamsacsVpe)
+}
+
 
 // GetVpeByIpaddr
 func (m *VpeManager) GetVpeByIpaddr(ip string) (*Vpe, error) {
@@ -85,25 +90,19 @@ func (m *VpeManager) AddVpe(item *Vpe) error {
 
 // UpdateVpe
 // Update VPE information. Undefined properties are not accepted, but the attrs property can be modified at will.
-func (m *VpeManager) UpdateVpe(params web.RequestParams) error {
-	sn := params.GetString("sn")
-	if common.IsEmptyOrNA(sn) {
+func (m *VpeManager) UpdateVpe(vpe *Vpe) error {
+	if common.IsEmptyOrNA(vpe.Sn) {
 		return fmt.Errorf("sn is empty or NA")
 	}
-	data := bson.M{
-		"update_time": time.Now(),
-	}
-	for k, v := range params.GetParamMap("attrs") {
-		data["attrs."+k] = v
-	}
-	query := bson.M{"sn": sn}
-	update := bson.M{"$set": data}
+
+	query := bson.M{"sn": vpe.Sn}
+	update := bson.M{"$set": vpe}
 	_, err := m.GetTeamsAcsCollection(TeamsacsVpe).UpdateOne(context.TODO(), query, update)
 	return err
 }
 
 // DeleteVpe
-func (m *CpeManager) DeleteVpe(sn string) error {
+func (m *VpeManager) DeleteVpe(sn string) error {
 	if common.IsEmptyOrNA(sn) {
 		return fmt.Errorf("sn is empty or NA")
 	}

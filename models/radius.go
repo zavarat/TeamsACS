@@ -35,8 +35,21 @@ func (m *ModelManager) GetRadiusManager() *RadiusManager {
 	return store.(*RadiusManager)
 }
 
+func (m *RadiusManager) QueryAccountings(params web.RequestParams) (*web.PageResult, error) {
+	return m.QueryPagerItems(params, TeamsacsAccounting)
+}
+
+func (m *RadiusManager) QueryAuthlogs(params web.RequestParams) (*web.PageResult, error) {
+	return m.QueryPagerItems(params, TeamsacsAuthlog)
+}
+
+func (m *RadiusManager) QueryOnlines(params web.RequestParams) (*web.PageResult, error) {
+	return m.QueryPagerItems(params, TeamsacsOnline)
+}
+
 func (m *RadiusManager) AddRadiusAuthLog(username string, nasip string, result string, reason string, cast int64) error {
 	authlog := Authlog{
+		ID: common.UUID(),
 		Username:  username,
 		NasAddr:   nasip,
 		Result:    result,
@@ -122,6 +135,7 @@ func (m *RadiusManager) UpdateRadiusOnline(form *web.WebForm) error {
 	var sessionId = form.GetVal2("acctSessionId", "")
 	var statusType = form.GetVal2("acctStatusType", "")
 	radOnline := Accounting{
+		ID: common.UUID(),
 		Username:          form.GetVal("username"),
 		NasId:             form.GetVal("nasid"),
 		NasAddr:           form.GetVal("nasip"),
