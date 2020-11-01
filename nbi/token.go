@@ -24,13 +24,20 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/ca17/teamsacs/common"
+	"github.com/ca17/teamsacs/models"
 )
 
 func (h *HttpHandler) RequestToken(c echo.Context) error {
 	params, err := h.JsonBodyParse(c)
 	common.Must(err)
 	username := params.GetMustString("username")
-	t, err := h.CreateAuthToken(username, username, "default")
+	apisecret := params.GetMustString("apisecret")
+	opr, err := h.GetManager().GetOpsManager().GetOperator(username)
+	common.Must(err)
+	if opr.ApiSecret != apisecret{
+		return h.GetInternalError("apisecret error")
+	}
+	t, err := h.CreateAuthToken(opr)
 	common.Must(err)
 	return c.JSON(http.StatusOK, h.RestResult(map[string]string{
 		"token": t,
@@ -38,15 +45,15 @@ func (h *HttpHandler) RequestToken(c echo.Context) error {
 }
 
 
-func (h *HttpHandler) CreateAuthToken(username, uid, level string) (string, error) {
+func (h *HttpHandler) CreateAuthToken(operator *models.Operator) (string, error) {
 	// Create token
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	// Set claims
 	claims := token.Claims.(jwt.MapClaims)
-	claims["usr"] = username
-	claims["uid"] = uid
-	claims["lvl"] = level
+	claims["usr"] = operator.Username
+	claims["uid"] = operator.ID
+	claims["lvl"] = operator.Level
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
 	t, err := token.SignedString([]byte(h.GetConfig().Web.JwtSecret))

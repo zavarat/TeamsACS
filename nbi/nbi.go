@@ -142,6 +142,7 @@ func (h *HttpHandler) GetUserLevel(c echo.Context) string {
 	return level.(string)
 }
 
+
 // Get current api user id
 func (h *HttpHandler) GetUserId(c echo.Context) string {
 	jd := h.GetJwtData(c)

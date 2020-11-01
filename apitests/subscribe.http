@@ -1,6 +1,6 @@
 POST http://{{nbi_url}}/nbi/subscribe/add
 Content-Type: application/json
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDQ0Nzc4NzcsImx2bCI6ImRlZmF1bHQiLCJ1aWQiOiJhZG1pbiIsInVzciI6ImFkbWluIn0.JXSIrTZUzFAByqk8Pl2280zkqvtETb1iX4Vovw14Gx0
+authorization: Bearer {{nbi_token}}
 
 {
   "id": "5f9ead80-2621-ad46-7036-27ad-2ec3e7a9",
@@ -37,7 +37,7 @@ authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDQ0Nzc4N
 
 POST http://{{nbi_url}}/nbi/subscribe/update
 Content-Type: application/json
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDQ0Nzc4NzcsImx2bCI6ImRlZmF1bHQiLCJ1aWQiOiJhZG1pbiIsInVzciI6ImFkbWluIn0.JXSIrTZUzFAByqk8Pl2280zkqvtETb1iX4Vovw14Gx0
+authorization: Bearer {{nbi_token}}
 
 {
   "username": "test01",
@@ -51,7 +51,7 @@ authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDQ0Nzc4N
 
 POST http://{{nbi_url}}/nbi/subscribe/query
 Content-Type: application/json
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDQ0Nzc4NzcsImx2bCI6ImRlZmF1bHQiLCJ1aWQiOiJhZG1pbiIsInVzciI6ImFkbWluIn0.JXSIrTZUzFAByqk8Pl2280zkqvtETb1iX4Vovw14Gx0
+authorization: Bearer {{nbi_token}}
 
 {}
 
@@ -59,12 +59,12 @@ authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDQ0Nzc4N
 
 
 GET http://{{nbi_url}}/nbi/subscribe/query
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDQ0Nzc4NzcsImx2bCI6ImRlZmF1bHQiLCJ1aWQiOiJhZG1pbiIsInVzciI6ImFkbWluIn0.JXSIrTZUzFAByqk8Pl2280zkqvtETb1iX4Vovw14Gx0
+authorization: Bearer {{nbi_token}}
 
 ###
 
 
 GET http://{{nbi_url}}/nbi/subscribe/delete?username=test01
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDQ0Nzc4NzcsImx2bCI6ImRlZmF1bHQiLCJ1aWQiOiJhZG1pbiIsInVzciI6ImFkbWluIn0.JXSIrTZUzFAByqk8Pl2280zkqvtETb1iX4Vovw14Gx0
+authorization: Bearer {{nbi_token}}
 
 ###

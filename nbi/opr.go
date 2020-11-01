@@ -19,15 +19,20 @@ package nbi
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 
 	"github.com/ca17/teamsacs/common"
+	"github.com/ca17/teamsacs/constant"
 	"github.com/ca17/teamsacs/models"
 )
 
 // QueryOperator
 func (h *HttpHandler) QueryOperator(c echo.Context) error {
+	if h.GetUserLevel(c) != constant.NBIAdminLevel {
+		return c.NoContent(http.StatusForbidden)
+	}
 	var result = make(map[string]interface{})
 	params := h.RequestParse(c)
 	data, err := h.GetManager().GetOpsManager().QueryOperators(params)
@@ -40,6 +45,9 @@ func (h *HttpHandler) QueryOperator(c echo.Context) error {
 
 // AddOperator
 func (h *HttpHandler) AddOperator(c echo.Context) error {
+	if h.GetUserLevel(c) != constant.NBIAdminLevel && !strings.HasPrefix(c.Request().RemoteAddr, "127.0.0.1")  {
+		return c.NoContent(http.StatusForbidden)
+	}
 	item := new(models.Operator)
 	common.Must(c.Bind(item))
 	_id, err := h.GetManager().GetOpsManager().AddOperator(item)
@@ -53,6 +61,9 @@ func (h *HttpHandler) AddOperator(c echo.Context) error {
 
 // UpdateOperator
 func (h *HttpHandler) UpdateOperator(c echo.Context) error {
+	if h.GetUserLevel(c) != constant.NBIAdminLevel {
+		return c.NoContent(http.StatusForbidden)
+	}
 	item := new(models.Operator)
 	common.Must(c.Bind(item))
 	err := h.GetManager().GetOpsManager().UpdateOperator(item)
@@ -63,6 +74,9 @@ func (h *HttpHandler) UpdateOperator(c echo.Context) error {
 
 // DeleteOperator
 func (h *HttpHandler) DeleteOperator(c echo.Context) error {
+	if h.GetUserLevel(c) != constant.NBIAdminLevel {
+		return c.NoContent(http.StatusForbidden)
+	}
 	params := h.RequestParse(c)
 	username := params.GetMustString("username")
 	common.Must(h.GetManager().GetOpsManager().DeleteOperator(username))

@@ -1,6 +1,6 @@
 POST http://{{nbi_url}}/nbi/cpe/add
 Content-Type: application/json
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDQ0Nzc4NzcsImx2bCI6ImRlZmF1bHQiLCJ1aWQiOiJhZG1pbiIsInVzciI6ImFkbWluIn0.JXSIrTZUzFAByqk8Pl2280zkqvtETb1iX4Vovw14Gx0
+authorization: Bearer {{nbi_token}}
 
 {
   "id": "5f9e7e70-6839-7148-2636-2450-1058db32",
@@ -13,7 +13,7 @@ authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDQ0Nzc4N
 
 POST http://{{nbi_url}}/nbi/cpe/update
 Content-Type: application/json
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDQ0Nzc4NzcsImx2bCI6ImRlZmF1bHQiLCJ1aWQiOiJhZG1pbiIsInVzciI6ImFkbWluIn0.JXSIrTZUzFAByqk8Pl2280zkqvtETb1iX4Vovw14Gx0
+authorization: Bearer {{nbi_token}}
 
 {
   "sn": "xxxxxx",
@@ -26,7 +26,7 @@ authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDQ0Nzc4N
 
 POST http://{{nbi_url}}/nbi/cpe/query
 Content-Type: application/json
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDQ0Nzc4NzcsImx2bCI6ImRlZmF1bHQiLCJ1aWQiOiJhZG1pbiIsInVzciI6ImFkbWluIn0.JXSIrTZUzFAByqk8Pl2280zkqvtETb1iX4Vovw14Gx0
+authorization: Bearer {{nbi_token}}
 
 {}
 
@@ -34,12 +34,12 @@ authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDQ0Nzc4N
 
 
 GET http://{{nbi_url}}/nbi/cpe/query
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDQ0Nzc4NzcsImx2bCI6ImRlZmF1bHQiLCJ1aWQiOiJhZG1pbiIsInVzciI6ImFkbWluIn0.JXSIrTZUzFAByqk8Pl2280zkqvtETb1iX4Vovw14Gx0
+authorization: Bearer {{nbi_token}}
 
 ###
 
 
 GET http://{{nbi_url}}/nbi/cpe/delete?sn=xxxxxx
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDQ0Nzc4NzcsImx2bCI6ImRlZmF1bHQiLCJ1aWQiOiJhZG1pbiIsInVzciI6ImFkbWluIn0.JXSIrTZUzFAByqk8Pl2280zkqvtETb1iX4Vovw14Gx0
+authorization: Bearer {{nbi_token}}
 
 ###
