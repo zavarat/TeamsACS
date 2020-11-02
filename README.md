@@ -37,6 +37,13 @@ It is also the officially recommended system by Mikrotik, which has been tested 
 - Provide the query API for basic device information and status data, and data maintenance API.
 - Provide a variety of policy management APIs, such as firewall rules, routing tables and so on.
 
+##  Links
+
+- [TeamsACS WIKI Documentation](https://github.com/CA17/TeamsACS/wiki)
+- [TLS encryption for RADIUS over TCP (RadSec) 00)](https://tools.ietf.org/id/draft-ietf-radext-radsec-00.html)
+- [TLS encryption for RADIUS over TCP (RadSec) 05](https://tools.ietf.org/html/draft-ietf-radext-radsec-05)
+- [mikrotik RADIUS Client](https://wiki.mikrotik.com/wiki/Manual:RADIUS_Client)
+
 ##  License
 
     Licensed to the Apache Software Foundation (ASF) under one or more
