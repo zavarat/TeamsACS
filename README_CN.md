@@ -37,7 +37,7 @@ TeamsACS 致力于为工作团队提供卓越的网络管理便捷性。我们�
 
 ##  链接
 
-- [TeamsACS WIKI 文档](https://github.com/CA17/TeamsACS/wiki)
+- [TeamsACS WIKI 文档](https://github.com/CA17/TeamsACS/wiki)<!-- @IGNORE PREVIOUS: link -->
 - [TLS encryption for RADIUS over TCP (RadSec) 00)](https://tools.ietf.org/id/draft-ietf-radext-radsec-00.html)
 - [TLS encryption for RADIUS over TCP (RadSec) 05](https://tools.ietf.org/html/draft-ietf-radext-radsec-05)
 - [mikrotik RADIUS Client](https://wiki.mikrotik.com/wiki/Manual:RADIUS_Client)
