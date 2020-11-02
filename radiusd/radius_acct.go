@@ -55,17 +55,6 @@ func (s *AcctService) ServeRADIUS(w radius.ResponseWriter, r *radius.Request) {
 
 	vendorReq := radparser.ParseVendor(r, vpe.VendorCode)
 
-	// Ldap acct
-	if vpe.LdapId != ""{
-		_, err := s.GetLdap(vpe.LdapId)
-		radlog.CheckError(err)
-		// check ldap auth
-		s.LdapUserAcct(r, vendorReq, username, vpe, nasrip)
-		// if ok
-		s.SendResponse(w, r)
-		return
-	}
-
 	// 获取有效用户
 	user, err := s.GetUserForAcct(username)
 	radlog.CheckError(err)

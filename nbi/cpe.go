@@ -49,7 +49,6 @@ func (h *HttpHandler) AddCpe(c echo.Context) error {
 	if err != nil {
 		return h.GetInternalError(err)
 	}
-	h.AddOpsLog(c, fmt.Sprintf("Add Cpe sn=%s", c.FormValue("sn")))
 	return c.JSON(200, h.RestSucc("Success"))
 }
 
@@ -57,7 +56,6 @@ func (h *HttpHandler) UpdateCpe(c echo.Context) error {
 	params := h.RequestParse(c)
 	err := h.GetManager().GetCpeManager().UpdateCpe(params)
 	common.Must(err)
-	h.AddOpsLog(c, fmt.Sprintf("Update CPE sn=%s", params.GetString("sn")))
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }
 
@@ -65,6 +63,5 @@ func (h *HttpHandler) DeleteCpe(c echo.Context) error {
 	params := h.RequestParse(c)
 	sn := params.GetMustString("sn")
 	common.Must(h.GetManager().GetCpeManager().DeleteCpe(sn))
-	h.AddOpsLog(c, fmt.Sprintf("Delete CPE sn=%s", sn))
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }

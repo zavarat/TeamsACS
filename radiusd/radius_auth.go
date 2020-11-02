@@ -63,22 +63,6 @@ func (s *AuthService) ServeRADIUS(w radius.ResponseWriter, r *radius.Request) {
 	vendorReq := radparser.ParseVendor(r, vpe.VendorCode)
 
 	// ----------------------------------------------------------------------------------------------------
-	// Ldap auth
-	if vpe.LdapId == ""{
-		lnode, err := s.GetLdap(vpe.LdapId)
-		s.CheckRadAuthError(start, username, ip, err)
-		// check ldap auth
-		userProfile, err := s.LdapUserAuth(w, r, username, lnode, response, vendorReq)
-		s.CheckRadAuthError(start, username, ip, err)
-		// setup accept
-		authorization.UpdateAuthorization(userProfile, vpe.VendorCode, response)
-		// if ok
-		s.SendAccept(w, r, response)
-		s.LogAuthSucess(start, username, ip)
-		return
-	}
-
-	// ----------------------------------------------------------------------------------------------------
 	// Fetch validate user
 	isMacAuth := vendorReq.Macaddr == username
 	user, err := s.GetUser(username, isMacAuth)

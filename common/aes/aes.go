@@ -23,33 +23,9 @@ import (
 	"encoding/base64"
 	"errors"
 
-	"github.com/vmihailenco/msgpack/v4"
-
 	"github.com/ca17/teamsacs/common/log"
 )
 
-func EncryptObject(obj interface{}, key string) ([]byte, error) {
-	bs, err := msgpack.Marshal(obj)
-	if err != nil {
-		return nil, err
-	}
-	result, err := Encrypt(bs, key)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
-}
-
-func DecryptObject(b []byte, key string, v interface{}) error {
-	bs, err := Decrypt(b, key)
-	if err != nil {
-		return err
-	}
-	if err := msgpack.Unmarshal(bs, v); err != nil {
-		return err
-	}
-	return nil
-}
 
 func Encrypt(orig []byte, key string) ([]byte, error) {
 	defer func() {

@@ -19,12 +19,10 @@ package models
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 
 	"github.com/ca17/teamsacs/common"
-	"github.com/ca17/teamsacs/common/log"
 	"github.com/ca17/teamsacs/common/web"
 	"github.com/ca17/teamsacs/constant"
 )
@@ -36,21 +34,6 @@ func (m *ModelManager) GetOpsManager() *OpsManager {
 	return store.(*OpsManager)
 }
 
-func (m *OpsManager) AddOpsLog(username string, srcip string, action string, remark string)  {
-	authlog := OpsLog{
-		ID: common.UUID(),
-		Username:  username,
-		Srcip:     srcip,
-		Action:    action,
-		Remark:    remark,
-		Timestamp: time.Now(),
-	}
-	coll := m.GetTeamsAcsCollection(TeamsacsOpslog)
-	_, err := coll.InsertOne(context.TODO(), authlog)
-	if err != nil {
-		log.Error(err)
-	}
-}
 
 // ExistOperator
 func (m *OpsManager) ExistOperator(username string) bool {

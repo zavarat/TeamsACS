@@ -1,3 +1,11 @@
+
+      _____                                    ___     ___     ___   
+     |_   _|   ___    __ _    _ __     ___    /   \   / __|   / __|  
+       | |    / -_)  / _` |  | '  \   (_-<    | - |  | (__    \__ \  
+      _|_|_   \___|  \__,_|  |_|_|_|  /__/_   |_|_|   \___|   |___/  
+    _|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_|"""""| 
+    "`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-' 
+
 # TeamsACS
 
 TeamsACS is committed to providing work teams with exceptional ease of network management. We use Mikrotik's network products as the core foundation, while extending the system's capabilities to a wider range of network devices, such as OpenWrt.

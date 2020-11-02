@@ -19,7 +19,6 @@ package models
 import (
 	"time"
 
-	"github.com/allegro/bigcache"
 	"github.com/go-co-op/gocron"
 	"github.com/labstack/echo/v4/middleware"
 	cmap "github.com/orcaman/concurrent-map"
@@ -58,9 +57,6 @@ type ModelManager struct {
 	Config       *config.AppConfig
 	Mongo        *mongo.Client
 	Sched        *gocron.Scheduler
-	LongCache    *bigcache.BigCache
-	M1Cache      *bigcache.BigCache
-	M5Cache      *bigcache.BigCache
 	TplRender    *tpl.CommonTemplate
 	Location     *time.Location
 	WebJwtConfig *middleware.JWTConfig

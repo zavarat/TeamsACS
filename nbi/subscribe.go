@@ -17,7 +17,6 @@
 package nbi
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -42,11 +41,10 @@ func (h *HttpHandler) QuerySubscribe(c echo.Context) error {
 func (h *HttpHandler) AddSubscribe(c echo.Context) error {
 	item := new(models.Subscribe)
 	common.Must(c.Bind(item))
-	_id, err := h.GetManager().GetSubscribeManager().AddSubscribe(item)
+	_, err := h.GetManager().GetSubscribeManager().AddSubscribe(item)
 	if err != nil {
 		return h.GetInternalError(err)
 	}
-	h.AddOpsLog(c, fmt.Sprintf("Add Subscribe id=%s", _id))
 	return c.JSON(200, h.RestSucc("Success"))
 }
 
@@ -57,7 +55,6 @@ func (h *HttpHandler) UpdateSubscribe(c echo.Context) error {
 	common.Must(c.Bind(item))
 	err := h.GetManager().GetSubscribeManager().UpdateSubscribe(item)
 	common.Must(err)
-	h.AddOpsLog(c, fmt.Sprintf("Update Subscribe id=%s",item.ID))
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }
 
@@ -66,7 +63,6 @@ func (h *HttpHandler) DeleteSubscribe(c echo.Context) error {
 	params := h.RequestParse(c)
 	username := params.GetMustString("username")
 	common.Must(h.GetManager().GetSubscribeManager().DeleteSubscribe(username))
-	h.AddOpsLog(c, fmt.Sprintf("Delete Subscribe username=%s", username))
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }
 

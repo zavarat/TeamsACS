@@ -17,7 +17,6 @@
 package nbi
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -50,11 +49,10 @@ func (h *HttpHandler) AddOperator(c echo.Context) error {
 	}
 	item := new(models.Operator)
 	common.Must(c.Bind(item))
-	_id, err := h.GetManager().GetOpsManager().AddOperator(item)
+	_, err := h.GetManager().GetOpsManager().AddOperator(item)
 	if err != nil {
 		return h.GetInternalError(err)
 	}
-	h.AddOpsLog(c, fmt.Sprintf("Add Operator id=%s", _id))
 	return c.JSON(200, h.RestSucc("Success"))
 }
 
@@ -68,7 +66,6 @@ func (h *HttpHandler) UpdateOperator(c echo.Context) error {
 	common.Must(c.Bind(item))
 	err := h.GetManager().GetOpsManager().UpdateOperator(item)
 	common.Must(err)
-	h.AddOpsLog(c, fmt.Sprintf("Update Operator id=%s",item.ID))
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }
 
@@ -80,7 +77,6 @@ func (h *HttpHandler) DeleteOperator(c echo.Context) error {
 	params := h.RequestParse(c)
 	username := params.GetMustString("username")
 	common.Must(h.GetManager().GetOpsManager().DeleteOperator(username))
-	h.AddOpsLog(c, fmt.Sprintf("Delete Operator username=%s", username))
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }
 

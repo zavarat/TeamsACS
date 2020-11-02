@@ -19,7 +19,6 @@ package nbi
 import (
 	"encoding/json"
 	"fmt"
-	"html"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -148,12 +147,6 @@ func (h *HttpHandler) GetUserId(c echo.Context) string {
 	jd := h.GetJwtData(c)
 	uid, _ := jd["uid"]
 	return uid.(string)
-}
-
-// Adding operational logs for audit
-func (h *HttpHandler) AddOpsLog(c echo.Context, desc string)  {
-	jd := h.GetJwtData(c)
-	h.GetManager().GetOpsManager().AddOpsLog(jd["usr"].(string), c.RealIP(), c.Path(), html.EscapeString(desc))
 }
 
 func (h *HttpHandler) JsonBodyParse(c echo.Context) (web.RequestParams, error)  {

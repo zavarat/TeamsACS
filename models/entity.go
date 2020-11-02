@@ -22,14 +22,15 @@ import (
 
 type Attributes = map[string]interface{}
 
+// Config
 type Config struct {
 	ID     string `bson:"_id,omitempty" json:"id,omitempty"`
 	Type   string `bson:"type" json:"type,omitempty"`
 	Name   string `bson:"name" json:"name,omitempty"`
 	Value  string `bson:"value" json:"value,omitempty"`
-	Remark string `bson:"remark" json:"remark,omitempty"`
 }
 
+// Operator
 type Operator struct {
 	ID        string   `bson:"_id,omitempty" json:"id,omitempty"`
 	Email     string   `bson:"email,omitempty" json:"email,omitempty"`
@@ -40,22 +41,28 @@ type Operator struct {
 	Remark    string   `bson:"remark,omitempty" json:"remark,omitempty"`
 }
 
-type OpsLog struct {
-	ID        string    `bson:"_id,omitempty" json:"id,omitempty"`
-	Username  string    `bson:"username,omitempty" json:"username,omitempty"`
-	Srcip     string    `bson:"srcip,omitempty" json:"srcip,omitempty"`
-	Action    string    `bson:"action,omitempty" json:"action,omitempty"`
-	Remark    string    `bson:"remark,omitempty" json:"remark,omitempty"`
-	Timestamp time.Time `bson:"timestamp,omitempty" json:"timestamp,omitempty"`
-}
-
 // VariableConfig
 type VariableConfig struct {
 	ID     string     `bson:"_id,omitempty" json:"id,omitempty"`
 	Vendor string     `bson:"vendor" json:"vendor,omitempty"`
 	Group  string     `bson:"group" json:"group,omitempty"`
-	Values Attributes `bson:"values" json:"values,omitempty"`
+	Attrs Attributes `bson:"attrs" json:"attrs,omitempty"`
 	Remark string     `bson:"remark" json:"remark,omitempty"`
+}
+
+// AppTemplate
+// Application template, defining an application specification
+type AppTemplate struct {
+	ID     string     `bson:"_id,omitempty" json:"id,omitempty"`
+	Attrs Attributes `bson:"attrs" json:"attrs,omitempty"`
+}
+
+// AppGroup
+// Creating a set of application specifications through application templates
+type AppGroup struct {
+	ID     string     `bson:"_id,omitempty" json:"id,omitempty"`
+	Name       string     `bson:"name,omitempty" json:"name,omitempty"`
+	Apps []Attributes `bson:"apps" json:"apps,omitempty"`
 }
 
 // Cpe
@@ -69,6 +76,9 @@ type Cpe struct {
 	UpdateTime time.Time  `bson:"update_time" json:"update_time,omitempty" `
 }
 
+
+// Vpe
+// VPE is also a BRAS system
 type Vpe struct {
 	ID         string     `bson:"_id,omitempty" json:"id,omitempty"`
 	Sn         string     `bson:"sn" json:"sn,omitempty"`
@@ -81,29 +91,17 @@ type Vpe struct {
 	VendorCode string     `bson:"vendor_code,omitempty" json:"vendor_code,omitempty"`
 	CoaPort    int        `bson:"coa_port,omitempty" json:"coa_port,omitempty"`
 	Status     string     `bson:"status,omitempty" json:"status,omitempty"`
-	LdapId     string     `bson:"ldap_id,omitempty" json:"ldap_id,omitempty,string"`
 	Remark     string     `bson:"remark,omitempty" json:"remark,omitempty"`
 }
 
-type Ldap struct {
-	ID         string `bson:"_id,omitempty" json:"id,omitempty"`
-	Name       string `bson:"name,omitempty" json:"name,omitempty"`
-	Address    string `bson:"address,omitempty" json:"address,omitempty"`
-	Password   string `bson:"password,omitempty" json:"-"`
-	Searchdn   string `bson:"searchdn,omitempty" json:"searchdn,omitempty"`
-	Basedn     string `bson:"basedn,omitempty" json:"basedn,omitempty"`
-	UserFilter string `bson:"user_filter,omitempty" json:"user_filter,omitempty"`
-	Istls      string `bson:"istls,omitempty" json:"istls,omitempty"`
-	Status     string `bson:"status,omitempty" json:"status,omitempty"`
-	Remark     string `bson:"remark,omitempty" json:"remark,omitempty"`
-}
 
+// ProfileAttr
+// Radius profile attrs
 type ProfileAttr struct {
 	Domain          string `bson:"domain" json:"domain,omitempty"`
 	InterimInterval int    `bson:"interim_interval" json:"interim_interval,omitempty"`
 	AddrPool        string `bson:"addr_pool" json:"addr_pool,omitempty"`
 	ActiveNum       int    `bson:"active_num" json:"active_num,omitempty"`
-	MfaStatus       string `bson:"mfa_status" json:"mfa_status,omitempty"`
 	UpRate          int    `bson:"up_rate" json:"up_rate,omitempty"`
 	DownRate        int    `bson:"down_rate" json:"down_rate,omitempty"`
 	LimitPolicy     string `bson:"limit_policy" json:"limit_policy,omitempty"`
@@ -111,6 +109,8 @@ type ProfileAttr struct {
 	DownLimitPolicy string `bson:"down_limit_policy" json:"down_limit_policy,omitempty"`
 }
 
+// Profile
+// Radius profile
 type Profile struct {
 	ProfileAttr
 	ID           string `bson:"_id,omitempty" json:"id,omitempty"`
@@ -121,6 +121,7 @@ type Profile struct {
 	Remark       string `bson:"remark" json:"remark,omitempty"`
 }
 
+// Subscribe
 type Subscribe struct {
 	ID         string      `bson:"_id,omitempty" json:"id,omitempty"`
 	VpeSids    []string    `bson:"vpe_sids,omitempty" json:"vpe_sids,omitempty"`
@@ -129,8 +130,6 @@ type Subscribe struct {
 	Email      string      `bson:"email,omitempty" json:"email,omitempty"`
 	Username   string      `bson:"username,omitempty" json:"username,omitempty"`
 	Password   string      `bson:"password,omitempty" json:"password,omitempty"`
-	MfaStatus  string      `bson:"mfa_status,omitempty" json:"mfa_status,omitempty"`
-	MfaSecret  string      `bson:"mfa_secret,omitempty" json:"mfa_secret,omitempty"`
 	Ipaddr     string      `bson:"ipaddr,omitempty" json:"ipaddr,omitempty"`
 	Macaddr    string      `bson:"macaddr,omitempty" json:"macaddr,omitempty"`
 	Vlanid1    int         `bson:"vlanid_1,omitempty" json:"vlanid1,omitempty"`
@@ -143,6 +142,8 @@ type Subscribe struct {
 	Timestamp  time.Time   `bson:"timestamp,omitempty" json:"timestamp,omitempty"`
 }
 
+// Accounting
+// Radius Accounting Recode
 type Accounting struct {
 	ID                string    `bson:"_id,omitempty" json:"id,omitempty"`
 	Username          string    `bson:"username,omitempty" json:"username,omitempty"`

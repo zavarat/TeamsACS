@@ -14,31 +14,32 @@
  *
  */
 
-package models
+package nbi
 
 import (
-	"context"
+	"net/http"
 
-	"go.mongodb.org/mongo-driver/bson"
+	"github.com/labstack/echo/v4"
+
+	"github.com/ca17/teamsacs/common"
+	"github.com/ca17/teamsacs/models"
 )
 
-type LdapManager struct{ *ModelManager }
-
-func (m *ModelManager) GetLdapManager() *LdapManager {
-	store, _ := m.ManagerMap.Get("LdapManager")
-	return store.(*LdapManager)
-}
-
-func (m *LdapManager) FindLdapById(id string) (*Ldap, error) {
-	coll := m.GetTeamsAcsCollection(TeamsacsLdap)
-	doc := coll.FindOne(context.TODO(), bson.M{"_id":id})
-	err := doc.Err()
+func (h *HttpHandler) QueryConfig(c echo.Context) error {
+	var result = make(map[string]interface{})
+	params := h.RequestParse(c)
+	data, err := h.GetManager().GetConfigManager().QueryConfig(params)
 	if err != nil {
-		return nil, err
+		return h.GetInternalError(err)
 	}
-	var result = new(Ldap)
-	err = doc.Decode(result)
-	return result, err
+	result["data"] = data
+	return c.JSON(http.StatusOK, result)
 }
 
-
+func (h *HttpHandler) UpdateConfig(c echo.Context) error {
+	item := new(models.Config)
+	common.Must(c.Bind(item))
+	err := h.GetManager().GetConfigManager().UpdateConfigValue(item.Type, item.Name, item.Value)
+	common.Must(err)
+	return c.JSON(http.StatusOK, h.RestSucc("Success"))
+}

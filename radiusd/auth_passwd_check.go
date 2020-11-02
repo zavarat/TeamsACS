@@ -12,7 +12,6 @@ import (
 	"layeh.com/radius/rfc3079"
 
 	"github.com/ca17/teamsacs/common/aes"
-	"github.com/ca17/teamsacs/common/mfa"
 	"github.com/ca17/teamsacs/constant"
 	"github.com/ca17/teamsacs/models"
 	radlog "github.com/ca17/teamsacs/radiusd/radlog"
@@ -22,14 +21,6 @@ import (
 func (s *AuthService) GetLocalPassword(user *models.Subscribe, isMacAuth bool) (string,error) {
 	if isMacAuth {
 		return user.Macaddr, nil
-	}
-	isOtp := s.GetStringConfig(constant.RadiusMfaStatus, constant.DISABLED) == constant.ENABLED
-	if isOtp && user.MfaStatus == constant.ENABLED && user.MfaSecret != "" {
-		lpwd, err := mfa.NewGoogleAuth().GetCode(user.MfaSecret)
-		if err != nil {
-			return "", fmt.Errorf("user:%s OTP password is invalid", user.Username)
-		}
-		return lpwd, nil
 	}
 	localpwd, err := aes.DecryptFromB64(user.Password, s.GetAppConfig().System.Aeskey)
 	if err != nil {

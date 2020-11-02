@@ -36,21 +36,18 @@ type SubscribeQueryForm struct {
 	Username string `query:"username" form:"username"`
 }
 
-
-type QueryResult = []map[string]interface{}
-
-func (m *ModelManager) QueryItems(form *web.WebForm, collatiion string) (QueryResult, error) {
+func (m *ModelManager) QueryItems(params web.RequestParams, collatiion string) (*web.QueryResult, error) {
 	var findOptions = options.Find()
 	coll := m.GetTeamsAcsCollection(collatiion)
 	var q = bson.M{}
-	for qname, vals := range form.Gets {
-		q[qname] = vals[0]
+	for qname, val := range params.GetParamMap("querymap") {
+		q[qname] = val
 	}
 	cur, err := coll.Find(context.TODO(), q, findOptions)
 	if err != nil {
 		return nil, err
 	}
-	items := make(QueryResult, 0)
+	items := make(web.QueryResult, 0)
 	for cur.Next(context.TODO()) {
 		var elem map[string]interface{}
 		err := cur.Decode(&elem)
@@ -60,7 +57,7 @@ func (m *ModelManager) QueryItems(form *web.WebForm, collatiion string) (QueryRe
 			items = append(items, elem)
 		}
 	}
-	return items, nil
+	return &items, nil
 }
 
 func (m *ModelManager) QueryPagerItems(params web.RequestParams, collatiion string) (*web.PageResult, error) {

@@ -45,7 +45,6 @@ func (h *HttpHandler) AddVpe(c echo.Context) error {
 		common.Must(fmt.Errorf("sn is empty or NA"))
 	}
 	common.Must(h.GetManager().GetVpeManager().AddVpe(item))
-	h.AddOpsLog(c, fmt.Sprintf("Add Vpe sn=%s", c.FormValue("sn")))
 	return c.JSON(200, h.RestSucc("Success"))
 }
 
@@ -54,7 +53,6 @@ func (h *HttpHandler) UpdateVpe(c echo.Context) error {
 	common.Must(c.Bind(item))
 	err := h.GetManager().GetVpeManager().UpdateVpe(item)
 	common.Must(err)
-	h.AddOpsLog(c, fmt.Sprintf("Update Vpe sn=%s", item.Sn))
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }
 
@@ -62,7 +60,6 @@ func (h *HttpHandler) DeleteVpe(c echo.Context) error {
 	params := h.RequestParse(c)
 	sn := params.GetMustString("sn")
 	common.Must(h.GetManager().GetVpeManager().DeleteVpe(sn))
-	h.AddOpsLog(c, fmt.Sprintf("Delete Vpe sn=%s", sn))
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }
 

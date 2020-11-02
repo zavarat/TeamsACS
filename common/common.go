@@ -33,21 +33,18 @@ import (
 	"path"
 	"reflect"
 	"regexp"
-	"runtime"
 	"strings"
 	"time"
 
 	"github.com/pkg/errors"
 
 	"github.com/bwmarrin/snowflake"
-	"gopkg.in/go-playground/pool.v3"
 
 	"github.com/ca17/teamsacs/common/log"
 )
 
 var (
 	EmptyList = []interface{}{}
-	Workpool  pool.Pool
 )
 
 const (
@@ -58,7 +55,6 @@ const (
 
 
 func init() {
-	Workpool = pool.NewLimited(uint(runtime.NumCPU()))
 }
 
 // print usage

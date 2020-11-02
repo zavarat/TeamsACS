@@ -21,6 +21,8 @@ import (
 	"strconv"
 
 	"go.mongodb.org/mongo-driver/bson"
+
+	"github.com/ca17/teamsacs/common/web"
 )
 
 type ConfigManager struct{ *ModelManager }
@@ -30,10 +32,13 @@ func (m *ModelManager) GetConfigManager() *ConfigManager {
 	return store.(*ConfigManager)
 }
 
+func (m *ConfigManager) QueryConfig(params web.RequestParams) (*web.QueryResult, error) {
+	return m.QueryItems(params, TeamsacsConfig)
+}
 
-func (m *ConfigManager) GetConfigValue(ctype, name string) string{
+func (m *ConfigManager) GetConfigValue(ctype, name string) string {
 	coll := m.GetTeamsAcsCollection(TeamsacsConfig)
-	doc := coll.FindOne(context.TODO(), bson.M{"type":ctype, "name":name})
+	doc := coll.FindOne(context.TODO(), bson.M{"type": ctype, "name": name})
 	err := doc.Err()
 	if err != nil {
 		return ""
@@ -43,9 +48,9 @@ func (m *ConfigManager) GetConfigValue(ctype, name string) string{
 	return result.Value
 }
 
-func (m *ConfigManager) GetRadiusConfigValue(name string) string{
+func (m *ConfigManager) GetRadiusConfigValue(name string) string {
 	coll := m.GetTeamsAcsCollection(TeamsacsConfig)
-	doc := coll.FindOne(context.TODO(), bson.M{"type":"radius", "name":name})
+	doc := coll.FindOne(context.TODO(), bson.M{"type": "radius", "name": name})
 	err := doc.Err()
 	if err != nil {
 		return ""
@@ -55,7 +60,7 @@ func (m *ConfigManager) GetRadiusConfigValue(name string) string{
 	return result
 }
 
-func (m *ConfigManager) GetRadiusConfigStringValue(name string, defval string) string{
+func (m *ConfigManager) GetRadiusConfigStringValue(name string, defval string) string {
 	val := m.GetRadiusConfigValue(name)
 	if val == "" {
 		return defval
@@ -63,14 +68,22 @@ func (m *ConfigManager) GetRadiusConfigStringValue(name string, defval string) s
 	return val
 }
 
-func (m *ConfigManager) GetRadiusConfigIntValue(name string, defval int64) int64{
+func (m *ConfigManager) GetRadiusConfigIntValue(name string, defval int64) int64 {
 	val := m.GetRadiusConfigValue(name)
 	if val == "" {
 		return defval
 	}
-	v, err :=  strconv.ParseInt(val, 10, 64)
+	v, err := strconv.ParseInt(val, 10, 64)
 	if err != nil {
 		return defval
 	}
 	return v
+}
+
+func (m *ConfigManager) UpdateConfigValue(ctype, name, value string) error {
+	coll := m.GetTeamsAcsCollection(TeamsacsConfig)
+	query := bson.M{"type": ctype, "name": name}
+	update := bson.M{"$set": bson.M{"value": value}}
+	_, err := coll.UpdateOne(context.TODO(), query, update)
+	return err
 }

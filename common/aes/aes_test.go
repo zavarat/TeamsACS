@@ -48,31 +48,6 @@ func TestAes2(t *testing.T) {
 	t.Log(res, string(res))
 }
 
-func TestAesObject(t *testing.T) {
 
-	obj := &Item{Foo: "foo"}
-	bs, _ := EncryptObject(&obj, key)
-	t.Log(bs)
-
-	var item interface{}
-	DecryptObject(bs, key, &item)
-	t.Log(item)
-}
-
-func BenchmarkAesEncryptObject(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		obj := &Item{Foo: "foo"}
-		EncryptObject(&obj, key)
-	}
-}
-
-func BenchmarkAesDecryptObject(b *testing.B) {
-	obj := &Item{Foo: "foo"}
-	bs, _ := EncryptObject(&obj, key)
-	for i := 0; i < b.N; i++ {
-		var item interface{}
-		DecryptObject(bs, key, &item)
-	}
-}
 
 
