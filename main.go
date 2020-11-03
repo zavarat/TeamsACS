@@ -35,6 +35,7 @@ import (
 	"github.com/ca17/teamsacs/nbi"
 	"github.com/ca17/teamsacs/radiusd"
 	"github.com/ca17/teamsacs/radiusd/radlog"
+	"github.com/ca17/teamsacs/syslogd"
 )
 
 var (
@@ -63,9 +64,11 @@ var (
 	dev             = flag.Bool("dev", false, "run develop mode")
 	port            = flag.Int("p", 0, "web port")
 	install         = flag.Bool("install", false, "run install")
-	startFreeradius = flag.Bool("freeradius", true, "run freeradius api")
-	startNbi        = flag.Bool("nbiservice", true, "run northbound interface api")
-	startSbi        = flag.Bool("sbiservice", true, "run southbound interface api")
+	startFreeradius = flag.Bool("freeradius-api", true, "run freeradius api")
+	startNbi        = flag.Bool("nbi-service", true, "run northbound interface api")
+	startSbi        = flag.Bool("sbi-service", true, "run southbound interface api")
+	startRfc3164    = flag.Bool("syslog-rfc3164", false, "run rfc3164 syslog server")
+	startRfc5424    = flag.Bool("syslog-rfc5424", false, "run rfc5424 syslog server")
 	uninstall       = flag.Bool("uninstall", false, "run uninstall")
 	initcfg         = flag.Bool("initcfg", false, "write default config > /etc/teamsacs.yaml")
 	initSuper       = flag.Bool("initsuper", false, "init super password to 'Teams@Acs' ")
@@ -95,14 +98,14 @@ func printHelp() {
 func setupAppconfig() *config.AppConfig {
 	appconfig := config.LoadConfig(*conffile)
 	if *port > 0 {
-		appconfig.Web.Port = *port
+		appconfig.NBI.Port = *port
 	}
 
 	if *syslogaddr != "" {
 		appconfig.System.SyslogAddr = *syslogaddr
 	}
 	if *debug {
-		appconfig.Web.Debug = *debug
+		appconfig.NBI.Debug = *debug
 		appconfig.Radiusd.Debug = *debug
 		appconfig.Grpc.Debug = *debug
 	}
@@ -113,7 +116,7 @@ func setupAppconfig() *config.AppConfig {
 func setupLogging(appconfig *config.AppConfig) {
 	// system logging
 	level := logging.INFO
-	if appconfig.Web.Debug {
+	if appconfig.NBI.Debug {
 		level = logging.DEBUG
 	}
 	log.SetupLog(level, appconfig.System.SyslogAddr, appconfig.GetLogDir(), appconfig.System.Appid)
@@ -222,6 +225,26 @@ func main() {
 			return nbi.ListenNBIServer(manager)
 		})
 	}
+
+	syslogserv := syslogd.NewSyslogServer(manager)
+	if *startRfc3164 {
+		g.Go(func() error {
+			log.Info("Start rfc3164 Syslog Server ...")
+			return syslogserv.StartRfc3164()
+		})
+	}
+
+	if *startRfc5424 {
+		g.Go(func() error {
+			log.Info("Start rfc5424 Syslog Server ...")
+			return syslogserv.StartRfc5424()
+		})
+	}
+
+	g.Go(func() error {
+		log.Info("Start Syslog Server ...")
+		return syslogserv.StartTextlog()
+	})
 
 	time.Sleep(time.Millisecond * 50)
 

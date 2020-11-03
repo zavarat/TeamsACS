@@ -179,8 +179,8 @@ var F5LTMUserRole_Strings = map[F5LTMUserRole]string{
 	F5LTMUserRole_Value_CertificateManager:                  "Certificate-Manager",
 	F5LTMUserRole_Value_IRuleManager:                        "IRule-Manager",
 	F5LTMUserRole_Value_Guest:                               "Guest",
-	F5LTMUserRole_Value_WebApplicationSecurityAdministrator: "Web-Application-Security-Administrator",
-	F5LTMUserRole_Value_WebApplicationSecurityEditor:        "Web-Application-Security-Editor",
+	F5LTMUserRole_Value_WebApplicationSecurityAdministrator: "NBI-Application-Security-Administrator",
+	F5LTMUserRole_Value_WebApplicationSecurityEditor:        "NBI-Application-Security-Editor",
 	F5LTMUserRole_Value_AccelerationPolicyEditor:            "Acceleration-Policy-Editor",
 	F5LTMUserRole_Value_NoAccess:                            "No-Access",
 }

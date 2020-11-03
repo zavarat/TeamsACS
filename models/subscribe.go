@@ -19,6 +19,7 @@ package models
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 
@@ -26,6 +27,29 @@ import (
 	"github.com/ca17/teamsacs/common/web"
 	"github.com/ca17/teamsacs/constant"
 )
+
+
+// Subscribe
+type Subscribe struct {
+	ID         string      `bson:"_id,omitempty" json:"id,omitempty"`
+	VpeSids    []string    `bson:"vpe_sids,omitempty" json:"vpe_sids,omitempty"`
+	Profile    ProfileAttr `bson:"profile,omitempty" json:"profile,omitempty,omitempty"`
+	Realname   string      `bson:"realname,omitempty" json:"realname,omitempty"`
+	Email      string      `bson:"email,omitempty" json:"email,omitempty"`
+	Username   string      `bson:"username,omitempty" json:"username,omitempty"`
+	Password   string      `bson:"password,omitempty" json:"password,omitempty"`
+	Ipaddr     string      `bson:"ipaddr,omitempty" json:"ipaddr,omitempty"`
+	Macaddr    string      `bson:"macaddr,omitempty" json:"macaddr,omitempty"`
+	Vlanid1    int         `bson:"vlanid_1,omitempty" json:"vlanid1,omitempty"`
+	Vlanid2    int         `bson:"vlanid_2,omitempty" json:"vlanid2,omitempty"`
+	BindMac    int         `bson:"bind_mac,omitempty" json:"bind_mac,omitempty"`
+	BindVlan   int         `bson:"bind_vlan,omitempty" json:"bind_vlan,omitempty"`
+	Status     string      `bson:"status,omitempty" json:"status,omitempty"`
+	Remark     string      `bson:"remark,omitempty" json:"remark,omitempty"`
+	ExpireTime time.Time   `bson:"expire_time,omitempty" json:"expire_time,omitempty"`
+	Timestamp  time.Time   `bson:"timestamp,omitempty" json:"timestamp,omitempty"`
+}
+
 
 type SubscribeManager struct{ *ModelManager }
 

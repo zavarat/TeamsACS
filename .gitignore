@@ -6,3 +6,4 @@ __pycache__
 release
 /common/static/static.go
 /common/resources/resources.go
+/Dockerfile.local

@@ -17,15 +17,18 @@
 package models
 
 import (
+	"context"
 	"time"
 
 	"github.com/go-co-op/gocron"
 	"github.com/labstack/echo/v4/middleware"
 	cmap "github.com/orcaman/concurrent-map"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/common/gmail"
+	"github.com/ca17/teamsacs/common/log"
 	"github.com/ca17/teamsacs/common/mongodb"
 	"github.com/ca17/teamsacs/common/tpl"
 	"github.com/ca17/teamsacs/config"
@@ -39,18 +42,20 @@ const (
 	TeamsacsSubscribe  = "subscribe"
 	TeamsacsOpslog     = "opslog"
 	TeamsacsLdap       = "ldap"
-	TeamsacsVpe       = "vpe"
-	TeamsacsCpe       = "cpe"
+	TeamsacsVpe        = "vpe"
+	TeamsacsCpe        = "cpe"
 	TeamsacsOnline     = "online"
 	TeamsacsProfile    = "profile"
 	TeamsacsAccounting = "accounting"
-	TeamsacsAuthlog = "authlog"
+	TeamsacsAuthlog    = "authlog"
+	TeamsacsSyslog     = "syslog"
 
 	GenieacsDevices = "devices"
 	GenieacsFaults  = "faults"
 	GenieacsTasks   = "tasks"
 	GenieacsPresets = "presets"
 )
+
 type Doc = map[string]interface{}
 
 type ModelManager struct {
@@ -76,11 +81,26 @@ func NewModelManager(appconfig *config.AppConfig, dev bool) *ModelManager {
 	m.Location = loc
 	m.registerManagers()
 	m.TplRender = tpl.NewCommonTemplate([]string{"/resources/templates"}, m.Dev, m.GetTemplateFuncMap())
+	m.SetupSyslogDB()
 	go m.StartScheduler()
 	return m
 }
 
-func (m *ModelManager) registerManagers()  {
+func (m *ModelManager) SetupSyslogDB() {
+	var Capped = true
+	var size = int64(1024 * 64)
+	var max = int64(m.Config.Syslogd.MaxRecodes)
+	err := m.Mongo.Database(MDBTeamsacs).CreateCollection(context.TODO(), TeamsacsSyslog, &options.CreateCollectionOptions{
+		Capped:              &Capped,
+		MaxDocuments:        &max,
+		SizeInBytes:         &size,
+	})
+	if err != nil {
+		log.Error(err)
+	}
+}
+
+func (m *ModelManager) registerManagers() {
 	m.ManagerMap.Set("SubscribeManager", &SubscribeManager{m})
 	m.ManagerMap.Set("RadiusManager", &RadiusManager{m})
 	m.ManagerMap.Set("VpeManager", &VpeManager{m})
@@ -89,7 +109,6 @@ func (m *ModelManager) registerManagers()  {
 	m.ManagerMap.Set("ConfigManager", &ConfigManager{m})
 	m.ManagerMap.Set("GenieacsManager", &GenieacsManager{m})
 }
-
 
 func (m *ModelManager) GetTeamsAcsCollection(coll string) *mongo.Collection {
 	return m.Mongo.Database(MDBTeamsacs).Collection(coll)
@@ -106,4 +125,3 @@ func (m *ModelManager) GetTemplateFuncMap() map[string]interface{} {
 		},
 	}
 }
-

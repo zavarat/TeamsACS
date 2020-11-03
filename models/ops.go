@@ -27,6 +27,19 @@ import (
 	"github.com/ca17/teamsacs/constant"
 )
 
+
+// Operator
+type Operator struct {
+	ID        string `bson:"_id,omitempty" json:"id,omitempty"`
+	Email     string `bson:"email,omitempty" json:"email,omitempty"`
+	Username  string `bson:"username,omitempty" json:"username,omitempty"`
+	Level     string `bson:"level" json:"level,omitempty"`
+	ApiSecret string `bson:"api_secret,omitempty" json:"api_secret,omitempty"`
+	Status    string `bson:"status,omitempty" json:"status,omitempty"`
+	Remark    string `bson:"remark,omitempty" json:"remark,omitempty"`
+}
+
+
 type OpsManager struct{ *ModelManager }
 
 func (m *ModelManager) GetOpsManager() *OpsManager {

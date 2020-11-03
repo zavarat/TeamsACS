@@ -27,6 +27,25 @@ import (
 	"github.com/ca17/teamsacs/constant"
 )
 
+// Vpe
+// VPE is also a BRAS system
+type Vpe struct {
+	ID         string     `bson:"_id,omitempty" json:"id,omitempty"`
+	Sn         string     `bson:"sn" json:"sn,omitempty"`
+	DeviceId   string     `bson:"device_id" json:"device_id,omitempty" `
+	Attrs      Attributes `bson:"attrs" json:"attrs,omitempty" `
+	Identifier string     `bson:"identifier,omitempty" json:"identifier,omitempty"`
+	Name       string     `bson:"name,omitempty" json:"name,omitempty"`
+	Ipaddr     string     `bson:"ipaddr,omitempty" json:"ipaddr,omitempty"`
+	Secret     string     `bson:"secret,omitempty" json:"secret,omitempty"`
+	VendorCode string     `bson:"vendor_code,omitempty" json:"vendor_code,omitempty"`
+	CoaPort    int        `bson:"coa_port,omitempty" json:"coa_port,omitempty"`
+	Status     string     `bson:"status,omitempty" json:"status,omitempty"`
+	Remark     string     `bson:"remark,omitempty" json:"remark,omitempty"`
+}
+
+
+
 type VpeManager struct{ *ModelManager }
 
 func (m *ModelManager) GetVpeManager() *VpeManager {

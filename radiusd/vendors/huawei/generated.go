@@ -9302,7 +9302,7 @@ const (
 
 var HuaweiAuthType_Strings = map[HuaweiAuthType]string{
 	HuaweiAuthType_Value_PPP:            "PPP",
-	HuaweiAuthType_Value_Web:            "Web",
+	HuaweiAuthType_Value_Web:            "NBI",
 	HuaweiAuthType_Value_Dot1x:          "Dot1x",
 	HuaweiAuthType_Value_Fast:           "Fast",
 	HuaweiAuthType_Value_Bind:           "Bind",

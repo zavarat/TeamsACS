@@ -22,77 +22,31 @@ import (
 
 type Attributes = map[string]interface{}
 
-// Config
-type Config struct {
-	ID     string `bson:"_id,omitempty" json:"id,omitempty"`
-	Type   string `bson:"type" json:"type,omitempty"`
-	Name   string `bson:"name" json:"name,omitempty"`
-	Value  string `bson:"value" json:"value,omitempty"`
-}
-
-// Operator
-type Operator struct {
-	ID        string   `bson:"_id,omitempty" json:"id,omitempty"`
-	Email     string   `bson:"email,omitempty" json:"email,omitempty"`
-	Username  string   `bson:"username,omitempty" json:"username,omitempty"`
-	Level  string   `bson:"level" json:"level,omitempty"`
-	ApiSecret string   `bson:"api_secret,omitempty" json:"api_secret,omitempty"`
-	Status    string   `bson:"status,omitempty" json:"status,omitempty"`
-	Remark    string   `bson:"remark,omitempty" json:"remark,omitempty"`
-}
 
 // VariableConfig
 type VariableConfig struct {
 	ID     string     `bson:"_id,omitempty" json:"id,omitempty"`
 	Vendor string     `bson:"vendor" json:"vendor,omitempty"`
 	Group  string     `bson:"group" json:"group,omitempty"`
-	Attrs Attributes `bson:"attrs" json:"attrs,omitempty"`
+	Attrs  Attributes `bson:"attrs" json:"attrs,omitempty"`
 	Remark string     `bson:"remark" json:"remark,omitempty"`
 }
 
 // AppTemplate
 // Application template, defining an application specification
 type AppTemplate struct {
-	ID     string     `bson:"_id,omitempty" json:"id,omitempty"`
+	ID    string     `bson:"_id,omitempty" json:"id,omitempty"`
 	Attrs Attributes `bson:"attrs" json:"attrs,omitempty"`
 }
 
 // AppGroup
 // Creating a set of application specifications through application templates
 type AppGroup struct {
-	ID     string     `bson:"_id,omitempty" json:"id,omitempty"`
-	Name       string     `bson:"name,omitempty" json:"name,omitempty"`
+	ID   string       `bson:"_id,omitempty" json:"id,omitempty"`
+	Name string       `bson:"name,omitempty" json:"name,omitempty"`
 	Apps []Attributes `bson:"apps" json:"apps,omitempty"`
 }
 
-// Cpe
-// attrs: Extended Attributes
-type Cpe struct {
-	Id         string     `bson:"_id,omitempty" json:"id,omitempty"`
-	Sn         string     `bson:"sn" json:"sn,omitempty"`
-	DeviceId   string     `bson:"device_id" json:"device_id,omitempty" `
-	Attrs      Attributes `bson:"attrs" json:"attrs,omitempty" `
-	CreateTime time.Time  `bson:"create_time" json:"create_time,omitempty" `
-	UpdateTime time.Time  `bson:"update_time" json:"update_time,omitempty" `
-}
-
-
-// Vpe
-// VPE is also a BRAS system
-type Vpe struct {
-	ID         string     `bson:"_id,omitempty" json:"id,omitempty"`
-	Sn         string     `bson:"sn" json:"sn,omitempty"`
-	DeviceId   string     `bson:"device_id" json:"device_id,omitempty" `
-	Attrs      Attributes `bson:"attrs" json:"attrs,omitempty" `
-	Identifier string     `bson:"identifier,omitempty" json:"identifier,omitempty"`
-	Name       string     `bson:"name,omitempty" json:"name,omitempty"`
-	Ipaddr     string     `bson:"ipaddr,omitempty" json:"ipaddr,omitempty"`
-	Secret     string     `bson:"secret,omitempty" json:"secret,omitempty"`
-	VendorCode string     `bson:"vendor_code,omitempty" json:"vendor_code,omitempty"`
-	CoaPort    int        `bson:"coa_port,omitempty" json:"coa_port,omitempty"`
-	Status     string     `bson:"status,omitempty" json:"status,omitempty"`
-	Remark     string     `bson:"remark,omitempty" json:"remark,omitempty"`
-}
 
 
 // ProfileAttr
@@ -121,64 +75,6 @@ type Profile struct {
 	Remark       string `bson:"remark" json:"remark,omitempty"`
 }
 
-// Subscribe
-type Subscribe struct {
-	ID         string      `bson:"_id,omitempty" json:"id,omitempty"`
-	VpeSids    []string    `bson:"vpe_sids,omitempty" json:"vpe_sids,omitempty"`
-	Profile    ProfileAttr `bson:"profile,omitempty" json:"profile,omitempty,omitempty"`
-	Realname   string      `bson:"realname,omitempty" json:"realname,omitempty"`
-	Email      string      `bson:"email,omitempty" json:"email,omitempty"`
-	Username   string      `bson:"username,omitempty" json:"username,omitempty"`
-	Password   string      `bson:"password,omitempty" json:"password,omitempty"`
-	Ipaddr     string      `bson:"ipaddr,omitempty" json:"ipaddr,omitempty"`
-	Macaddr    string      `bson:"macaddr,omitempty" json:"macaddr,omitempty"`
-	Vlanid1    int         `bson:"vlanid_1,omitempty" json:"vlanid1,omitempty"`
-	Vlanid2    int         `bson:"vlanid_2,omitempty" json:"vlanid2,omitempty"`
-	BindMac    int         `bson:"bind_mac,omitempty" json:"bind_mac,omitempty"`
-	BindVlan   int         `bson:"bind_vlan,omitempty" json:"bind_vlan,omitempty"`
-	Status     string      `bson:"status,omitempty" json:"status,omitempty"`
-	Remark     string      `bson:"remark,omitempty" json:"remark,omitempty"`
-	ExpireTime time.Time   `bson:"expire_time,omitempty" json:"expire_time,omitempty"`
-	Timestamp  time.Time   `bson:"timestamp,omitempty" json:"timestamp,omitempty"`
-}
-
-// Accounting
-// Radius Accounting Recode
-type Accounting struct {
-	ID                string    `bson:"_id,omitempty" json:"id,omitempty"`
-	Username          string    `bson:"username,omitempty" json:"username,omitempty"`
-	NasId             string    `bson:"nas_id,omitempty" json:"nas_id,omitempty"`
-	NasAddr           string    `bson:"nas_addr,omitempty" json:"nas_addr,omitempty"`
-	NasPaddr          string    `bson:"nas_paddr,omitempty" json:"nas_paddr,omitempty"`
-	SessionTimeout    int       `bson:"session_timeout,omitempty" json:"session_timeout,omitempty"`
-	FramedIpaddr      string    `bson:"framed_ipaddr,omitempty" json:"framed_ipaddr,omitempty"`
-	FramedNetmask     string    `bson:"framed_netmask,omitempty" json:"framed_netmask,omitempty"`
-	MacAddr           string    `bson:"mac_addr,omitempty" json:"mac_addr,omitempty"`
-	NasPort           int64     `bson:"nas_port,omitempty" json:"nas_port,omitempty,string"`
-	NasClass          string    `bson:"nas_class,omitempty" json:"nas_class,omitempty"`
-	NasPortId         string    `bson:"nas_port_id,omitempty" json:"nas_port_id,omitempty"`
-	NasPortType       int       `bson:"nas_port_type,omitempty" json:"nas_port_type,omitempty"`
-	ServiceType       int       `bson:"service_type,omitempty" json:"service_type,omitempty"`
-	AcctSessionId     string    `bson:"acct_session_id,omitempty" json:"acct_session_id,omitempty"`
-	AcctSessionTime   int       `bson:"acct_session_time,omitempty" json:"acct_session_time,omitempty"`
-	AcctInputTotal    int64     `bson:"acct_input_total,omitempty" json:"acct_input_total,omitempty,string"`
-	AcctOutputTotal   int64     `bson:"acct_output_total,omitempty" json:"acct_output_total,omitempty,string"`
-	AcctInputPackets  int       `bson:"acct_input_packets,omitempty" json:"acct_input_packets,omitempty"`
-	AcctOutputPackets int       `bson:"acct_output_packets,omitempty" json:"acct_output_packets,omitempty"`
-	AcctStartTime     time.Time `bson:"acct_start_time,omitempty" json:"acct_start_time,omitempty"`
-	LastUpdate        time.Time `bson:"last_update,omitempty" json:"last_update,omitempty"`
-	AcctStopTime      time.Time `bson:"acct_stop_time,omitempty" json:"acct_stop_time,omitempty"`
-}
-
-type Authlog struct {
-	ID        string    `bson:"_id,omitempty" json:"id,omitempty"`
-	Username  string    `bson:"username,omitempty" json:"username,omitempty"`
-	NasAddr   string    `bson:"nas_addr,omitempty" json:"nas_addr,omitempty"`
-	Cast      int       `bson:"cast,omitempty" json:"cast,omitempty"`
-	Result    string    `bson:"result,omitempty" json:"result,omitempty"`
-	Reason    string    `bson:"reason,omitempty" json:"reason,omitempty"`
-	Timestamp time.Time `bson:"timestamp,omitempty" json:"timestamp,omitempty"`
-}
 
 // AuthorizationProfile Method
 

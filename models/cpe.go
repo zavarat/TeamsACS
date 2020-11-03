@@ -27,6 +27,17 @@ import (
 	"github.com/ca17/teamsacs/common/web"
 )
 
+// Cpe
+// attrs: Extended Attributes
+type Cpe struct {
+	Id         string     `bson:"_id,omitempty" json:"id,omitempty"`
+	Sn         string     `bson:"sn" json:"sn,omitempty"`
+	DeviceId   string     `bson:"device_id" json:"device_id,omitempty" `
+	Attrs      Attributes `bson:"attrs" json:"attrs,omitempty" `
+	CreateTime time.Time  `bson:"create_time" json:"create_time,omitempty" `
+	UpdateTime time.Time  `bson:"update_time" json:"update_time,omitempty" `
+}
+
 type CpeManager struct{ *ModelManager }
 
 func (m *ModelManager) GetCpeManager() *CpeManager {

@@ -59,7 +59,7 @@ systemctl enable teamsacs && systemctl daemon-reload
 `
 
 func InitConfig(config *config.AppConfig) error {
-	// config.Web.JwtSecret = common.UUID()
+	// config.NBI.JwtSecret = common.UUID()
 	cfgstr, err := yaml.Marshal(config)
 	if err != nil {
 		return err

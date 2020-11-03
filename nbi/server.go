@@ -40,14 +40,14 @@ func ListenNBIServer(manager *models.ModelManager) error {
 	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
 		Level: 5,
 	}))
-	e.Use(ServerRecover(manager.Config.Web.Debug))
+	e.Use(ServerRecover(manager.Config.NBI.Debug))
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: "nbi ${time_rfc3339} ${remote_ip} ${method} ${uri} ${protocol} ${status} ${id} ${user_agent} ${latency} ${bytes_in} ${bytes_out} ${error}\n",
 		Output: os.Stdout,
 	}))
 	manager.WebJwtConfig = &middleware.JWTConfig{
 		SigningMethod: middleware.AlgorithmHS256,
-		SigningKey:    []byte(manager.Config.Web.JwtSecret),
+		SigningKey:    []byte(manager.Config.NBI.JwtSecret),
 		Skipper: func(c echo.Context) bool {
 			if strings.HasPrefix(c.Path(), "/nbi/status") ||
 				strings.HasPrefix(c.Path(), "/nbi/token") {
@@ -71,15 +71,15 @@ func ListenNBIServer(manager *models.ModelManager) error {
 	manager.TplRender = tpl.NewCommonTemplate([]string{"/resources/templates"}, manager.Dev, manager.GetTemplateFuncMap())
 	e.Renderer = manager.TplRender
 	e.HideBanner = true
-	e.Logger.SetLevel(common.If(manager.Config.Web.Debug, elog.DEBUG, elog.INFO).(elog.Lvl))
-	e.Debug = manager.Config.Web.Debug
+	e.Logger.SetLevel(common.If(manager.Config.NBI.Debug, elog.DEBUG, elog.INFO).(elog.Lvl))
+	e.Debug = manager.Config.NBI.Debug
 	log.Info("try start tls web server")
-	err := e.StartTLS(fmt.Sprintf("%s:%d", manager.Config.Web.Host, manager.Config.Web.Port),
+	err := e.StartTLS(fmt.Sprintf("%s:%d", manager.Config.NBI.Host, manager.Config.NBI.Port),
 		path.Join(manager.Config.GetPrivateDir(), "teamsacs-nbi.tls.crt"), path.Join(manager.Config.GetPrivateDir(), "teamsacs-nbi.tls.key"))
 	if err != nil {
 		log.Warningf("start tls server error %s", err)
 		log.Info("start web server")
-		err = e.Start(fmt.Sprintf("%s:%d", manager.Config.Web.Host, manager.Config.Web.Port))
+		err = e.Start(fmt.Sprintf("%s:%d", manager.Config.NBI.Host, manager.Config.NBI.Port))
 	}
 	return err
 }

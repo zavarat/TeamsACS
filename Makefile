@@ -47,6 +47,22 @@ build-linux:
 	' \
     -o ${RELEASE_DIR}/${BUILD_NAME} ${SOURCE}
 
+fastpub:
+	make build-linux
+	make upx
+	echo 'FROM alpine' > .build
+	echo 'ARG CACHEBUST="$(shell date "+%F %T")"' >> .build
+	echo 'COPY ./release/teamsacs /teamsacs' >> .build
+	echo 'RUN chmod +x /teamsacs' >> .build
+	echo 'EXPOSE 20991 20992 20993 1812/udp 1813/udp 20914/udp 20924/udp 20914/udp' >> .build
+	echo 'ENTRYPOINT ["/teamsacs"]' >> .build
+	docker build -t teamsacs . -f .build
+	rm -f .build
+	docker tag teamsacs docker.pkg.github.com/ca17/teamsacs/teamsacs:latest
+	docker push docker.pkg.github.com/ca17/teamsacs/teamsacs:latest
+	docker tag teamsacs alab.189csp.cn:5000/teamsacs:latest
+	docker push alab.189csp.cn:5000/teamsacs:latest
+
 upx:
 	upx ${RELEASE_DIR}/${BUILD_NAME}
 

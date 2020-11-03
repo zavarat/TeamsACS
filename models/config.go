@@ -25,6 +25,15 @@ import (
 	"github.com/ca17/teamsacs/common/web"
 )
 
+// Config
+type Config struct {
+	ID    string `bson:"_id,omitempty" json:"id,omitempty"`
+	Type  string `bson:"type" json:"type,omitempty"`
+	Name  string `bson:"name" json:"name,omitempty"`
+	Value string `bson:"value" json:"value,omitempty"`
+}
+
+
 type ConfigManager struct{ *ModelManager }
 
 func (m *ModelManager) GetConfigManager() *ConfigManager {

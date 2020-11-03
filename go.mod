@@ -7,8 +7,8 @@ require (
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-co-op/gocron v0.1.1
-	github.com/go-ldap/ldap/v3 v3.2.4
 	github.com/golang/protobuf v1.4.2
+	github.com/influxdata/go-syslog/v3 v3.0.0
 	github.com/labstack/echo/v4 v4.1.15
 	github.com/labstack/gommon v0.3.0
 	github.com/mitchellh/mapstructure v1.2.2

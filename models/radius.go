@@ -28,6 +28,45 @@ import (
 	"github.com/ca17/teamsacs/common/web"
 )
 
+type Authlog struct {
+	ID        string    `bson:"_id,omitempty" json:"id,omitempty"`
+	Username  string    `bson:"username,omitempty" json:"username,omitempty"`
+	NasAddr   string    `bson:"nas_addr,omitempty" json:"nas_addr,omitempty"`
+	Cast      int       `bson:"cast,omitempty" json:"cast,omitempty"`
+	Result    string    `bson:"result,omitempty" json:"result,omitempty"`
+	Reason    string    `bson:"reason,omitempty" json:"reason,omitempty"`
+	Timestamp time.Time `bson:"timestamp,omitempty" json:"timestamp,omitempty"`
+}
+
+// Accounting
+// Radius Accounting Recode
+type Accounting struct {
+	ID                string    `bson:"_id,omitempty" json:"id,omitempty"`
+	Username          string    `bson:"username,omitempty" json:"username,omitempty"`
+	NasId             string    `bson:"nas_id,omitempty" json:"nas_id,omitempty"`
+	NasAddr           string    `bson:"nas_addr,omitempty" json:"nas_addr,omitempty"`
+	NasPaddr          string    `bson:"nas_paddr,omitempty" json:"nas_paddr,omitempty"`
+	SessionTimeout    int       `bson:"session_timeout,omitempty" json:"session_timeout,omitempty"`
+	FramedIpaddr      string    `bson:"framed_ipaddr,omitempty" json:"framed_ipaddr,omitempty"`
+	FramedNetmask     string    `bson:"framed_netmask,omitempty" json:"framed_netmask,omitempty"`
+	MacAddr           string    `bson:"mac_addr,omitempty" json:"mac_addr,omitempty"`
+	NasPort           int64     `bson:"nas_port,omitempty" json:"nas_port,omitempty,string"`
+	NasClass          string    `bson:"nas_class,omitempty" json:"nas_class,omitempty"`
+	NasPortId         string    `bson:"nas_port_id,omitempty" json:"nas_port_id,omitempty"`
+	NasPortType       int       `bson:"nas_port_type,omitempty" json:"nas_port_type,omitempty"`
+	ServiceType       int       `bson:"service_type,omitempty" json:"service_type,omitempty"`
+	AcctSessionId     string    `bson:"acct_session_id,omitempty" json:"acct_session_id,omitempty"`
+	AcctSessionTime   int       `bson:"acct_session_time,omitempty" json:"acct_session_time,omitempty"`
+	AcctInputTotal    int64     `bson:"acct_input_total,omitempty" json:"acct_input_total,omitempty,string"`
+	AcctOutputTotal   int64     `bson:"acct_output_total,omitempty" json:"acct_output_total,omitempty,string"`
+	AcctInputPackets  int       `bson:"acct_input_packets,omitempty" json:"acct_input_packets,omitempty"`
+	AcctOutputPackets int       `bson:"acct_output_packets,omitempty" json:"acct_output_packets,omitempty"`
+	AcctStartTime     time.Time `bson:"acct_start_time,omitempty" json:"acct_start_time,omitempty"`
+	LastUpdate        time.Time `bson:"last_update,omitempty" json:"last_update,omitempty"`
+	AcctStopTime      time.Time `bson:"acct_stop_time,omitempty" json:"acct_stop_time,omitempty"`
+}
+
+
 type RadiusManager struct{ *ModelManager }
 
 func (m *ModelManager) GetRadiusManager() *RadiusManager {

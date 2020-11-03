@@ -42,7 +42,7 @@ type SysConfig struct {
 	Debug      bool   `yaml:"debug" json:"debug"`
 }
 
-type WebConfig struct {
+type NBIConfig struct {
 	Host      string `yaml:"host" json:"host"`
 	Port      int    `yaml:"port" json:"port"`
 	Debug     bool   `yaml:"debug" json:"debug"`
@@ -68,13 +68,23 @@ type RadiusdConfig struct {
 	Debug    bool   `yaml:"debug" json:"debug"`
 }
 
+type SyslogdConfig struct {
+	Host        string `yaml:"host" json:"host"`
+	Rfc5424Port int    `yaml:"rfc_5424_port" json:"rfc_5424_port"`
+	Rfc3164Port int    `yaml:"rfc_3164_port" json:"rfc_3164_port"`
+	TextlogPort int    `yaml:"textlog_port" json:"textlog_port"`
+	MaxRecodes  int    `yaml:"max_recodes" json:"max_recodes"`
+	Debug       bool   `yaml:"debug" json:"debug"`
+}
+
 type AppConfig struct {
 	System     SysConfig        `yaml:"system" json:"system"`
-	Web        WebConfig        `yaml:"web" json:"web"`
+	NBI        NBIConfig        `yaml:"nbi" json:"nbi"`
 	Freeradius FreeradiusConfig `yaml:"freeradius" json:"freeradius"`
 	Mongodb    MongodbConfig    `yaml:"mongodb" json:"mongodb"`
 	Grpc       GrpcConfig       `yaml:"grpc" json:"grpc"`
 	Radiusd    RadiusdConfig    `yaml:"radiusd" json:"radiusd"`
+	Syslogd    SyslogdConfig    `yaml:"syslogd" json:"syslogd"`
 }
 
 func (c *AppConfig) GetLogDir() string {
@@ -119,16 +129,16 @@ var DefaultAppConfig = &AppConfig{
 		Location:   "Asia/Shanghai",
 		Aeskey:     "5f8923be3da19452d3acdc9e69fa24e6",
 	},
-	Web: WebConfig{
+	NBI: NBIConfig{
 		Host:      "0.0.0.0",
 		Port:      20991,
 		Debug:     true,
 		JwtSecret: "9b6de5cc07384bf1acs10f568ac9da37",
 	},
 	Freeradius: FreeradiusConfig{
-		Host:      "0.0.0.0",
-		Port:      20992,
-		Debug:     true,
+		Host:  "0.0.0.0",
+		Port:  20992,
+		Debug: true,
 	},
 	Grpc: GrpcConfig{
 		Host:  "0.0.0.0",
@@ -140,6 +150,14 @@ var DefaultAppConfig = &AppConfig{
 		AuthPort: 1812,
 		AcctPort: 1813,
 		Debug:    true,
+	},
+	Syslogd: SyslogdConfig{
+		Host:        "0.0.0.0",
+		Rfc5424Port: 20914,
+		Rfc3164Port: 20924,
+		TextlogPort: 20934,
+		MaxRecodes:  100000,
+		Debug:       true,
 	},
 	Mongodb: MongodbConfig{
 		Url:    "mongodb://127.0.0.1:27017",
@@ -179,16 +197,16 @@ func LoadConfig(cfile string) *AppConfig {
 		cfg.System.Workdir = v
 	})
 	setEnvValue("TEAMSACS_WEB_HOST", func(v string) {
-		cfg.Web.Host = v
+		cfg.NBI.Host = v
 	})
 	setEnvValue("TEAMSACS_WEB_DEBUG", func(v string) {
-		cfg.Web.Debug = v == "true"
+		cfg.NBI.Debug = v == "true"
 	})
 	setEnvValue("TEAMSACS_WEB_SECRET", func(v string) {
-		cfg.Web.JwtSecret = v
+		cfg.NBI.JwtSecret = v
 	})
 	setEnvInt64Value("TEAMSACS_WEB_PORT", func(v int64) {
-		cfg.Web.Port = int(v)
+		cfg.NBI.Port = int(v)
 	})
 
 	setEnvValue("TEAMSACS_FREERADIUS_WEB_HOST", func(v string) {

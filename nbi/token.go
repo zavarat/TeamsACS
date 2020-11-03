@@ -56,7 +56,7 @@ func (h *HttpHandler) CreateAuthToken(operator *models.Operator) (string, error)
 	claims["lvl"] = operator.Level
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
-	t, err := token.SignedString([]byte(h.GetConfig().Web.JwtSecret))
+	t, err := token.SignedString([]byte(h.GetConfig().NBI.JwtSecret))
 	if err != nil {
 		return "", err
 	}
