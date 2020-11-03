@@ -46,6 +46,24 @@ type Vpe struct {
 
 
 
+func (a *Vpe) AddValidate() error {
+	switch {
+	case common.IsEmptyOrNA(a.Sn):
+		return fmt.Errorf("invalid sn")
+	case common.IsEmptyOrNA(a.Identifier):
+		return fmt.Errorf("invalid identifier")
+	case common.IsEmptyOrNA(a.Ipaddr):
+		return fmt.Errorf("invalid ipaddr")
+	case common.IsEmptyOrNA(a.Secret):
+		return fmt.Errorf("invalid secret")
+	case common.IsEmptyOrNA(a.VendorCode):
+		return fmt.Errorf("invalid vendor_code")
+	}
+	return nil
+}
+
+
+// VpeManager
 type VpeManager struct{ *ModelManager }
 
 func (m *ModelManager) GetVpeManager() *VpeManager {

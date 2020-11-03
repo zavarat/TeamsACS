@@ -17,8 +17,6 @@
 package nbi
 
 import (
-	"net/http"
-
 	"github.com/labstack/echo/v4"
 )
 
@@ -32,33 +30,45 @@ func (h *HttpHandler) InitAllRouter(e *echo.Echo) {
 
 	// Cpe apis
 	e.Any("/nbi/cpe/query", h.QueryCpe)
-	e.Add(http.MethodPost, "/nbi/cpe/add", h.AddCpe)
-	e.Add(http.MethodPost, "/nbi/cpe/update", h.UpdateCpe)
 	e.Any("/nbi/cpe/delete", h.DeleteCpe)
+	e.POST( "/nbi/cpe/add", h.AddCpe)
+	e.POST( "/nbi/cpe/update", h.UpdateCpe)
 
 	// Vpe apis
 	e.Any("/nbi/vpe/query", h.QueryVpe)
-	e.Add(http.MethodPost, "/nbi/vpe/add", h.AddVpe)
-	e.Add(http.MethodPost, "/nbi/vpe/update", h.UpdateVpe)
 	e.Any("/nbi/vpe/delete", h.DeleteVpe)
+	e.POST( "/nbi/vpe/add", h.AddVpe)
+	e.POST( "/nbi/vpe/update", h.UpdateVpe)
 
 	// Subscribe apis
 	e.Any("/nbi/subscribe/query", h.QuerySubscribe)
-	e.Add(http.MethodPost, "/nbi/subscribe/add",h.AddSubscribe)
-	e.Add(http.MethodPost, "/nbi/subscribe/update", h.UpdateSubscribe)
 	e.Any("/nbi/subscribe/delete", h.DeleteSubscribe)
+	e.POST("/nbi/subscribe/add",h.AddSubscribe)
+	e.POST("/nbi/subscribe/update", h.UpdateSubscribe)
 
 	// opr apis
 	e.Any("/nbi/opr/query", h.QueryOperator)
-	e.Add(http.MethodPost, "/nbi/opr/add",h.AddOperator)
-	e.Add(http.MethodPost, "/nbi/opr/update", h.UpdateOperator)
 	e.Any("/nbi/opr/delete", h.DeleteOperator)
+	e.POST( "/nbi/opr/add",h.AddOperator)
+	e.POST( "/nbi/opr/update", h.UpdateOperator)
+
+	// opr apis
+	e.Any("/nbi/data/query", h.QueryData)
+	e.Any("/nbi/data/get", h.GetData)
+	e.Any("/nbi/data/delete", h.DeleteData)
+	e.POST( "/nbi/data/add",h.AddData)
+	e.POST( "/nbi/data/update", h.UpdateData)
 
 	// radius apis
 	e.Any("/nbi/radius/accounting/query", h.QueryRadiusAccounting)
 	e.Any("/nbi/radius/authlog/query", h.QueryRadiusAuthlog)
 	e.Any("/nbi/radius/online/query", h.QueryRadiusOnline)
 
+	// config apis
+	e.POST("/nbi/config/radius/update", h.UpdateRadiusConfigs)
+	e.POST("/nbi/config/update", h.UpdateConfig)
+	e.Any("/nbi/config/query", h.QueryConfig)
+
 	// token
-	e.Add(http.MethodPost, "/nbi/token", h.RequestToken)
+	e.POST( "/nbi/token", h.RequestToken)
 }

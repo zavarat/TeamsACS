@@ -10,7 +10,6 @@ authorization: Bearer {{nbi_token}}
     "interim_interval": 0,
     "addr_pool": "N/A",
     "active_num": 1,
-    "mfa_status": "disabled",
     "up_rate": 1048576,
     "down_rate": 1048576,
     "limit_policy": "N/A",
@@ -21,14 +20,13 @@ authorization: Bearer {{nbi_token}}
   "email": "test@teamsacs.com",
   "username": "test01",
   "password": "888888",
-  "mfa_status": "disabled",
-  "mfa_secret": "N/A",
   "ipaddr": "N/A",
   "macaddr": "N/A",
   "vlanid1": 0,
   "vlanid2": 0,
   "bind_mac": 0,
   "bind_vlan": 0,
+  "expire_time": "2020-12-03T15:12:04.77394+08:00",
   "status": "Enabled",
   "remark": "Test user"
 }

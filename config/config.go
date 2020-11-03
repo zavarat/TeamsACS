@@ -131,18 +131,18 @@ var DefaultAppConfig = &AppConfig{
 	},
 	NBI: NBIConfig{
 		Host:      "0.0.0.0",
-		Port:      20991,
+		Port:      1979,
 		Debug:     true,
 		JwtSecret: "9b6de5cc07384bf1acs10f568ac9da37",
 	},
 	Freeradius: FreeradiusConfig{
 		Host:  "0.0.0.0",
-		Port:  20992,
+		Port:  1980,
 		Debug: true,
 	},
 	Grpc: GrpcConfig{
 		Host:  "0.0.0.0",
-		Port:  20993,
+		Port:  1981,
 		Debug: true,
 	},
 	Radiusd: RadiusdConfig{
@@ -153,9 +153,9 @@ var DefaultAppConfig = &AppConfig{
 	},
 	Syslogd: SyslogdConfig{
 		Host:        "0.0.0.0",
-		Rfc5424Port: 20914,
-		Rfc3164Port: 20924,
-		TextlogPort: 20934,
+		Rfc5424Port: 1914,
+		Rfc3164Port: 1924,
+		TextlogPort: 1934,
 		MaxRecodes:  100000,
 		Debug:       true,
 	},

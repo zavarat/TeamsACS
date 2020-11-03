@@ -32,7 +32,7 @@ type Syslog struct {
 }
 
 
-func (m *OpsManager) AddSyslog(item *Syslog)  {
+func (m *OperatorManager) AddSyslog(item *Syslog)  {
 	coll := m.GetTeamsAcsCollection(TeamsacsSyslog)
 	_, err := coll.InsertOne(context.TODO(), item)
 	if err != nil {
@@ -41,6 +41,6 @@ func (m *OpsManager) AddSyslog(item *Syslog)  {
 }
 
 
-func (m *OpsManager) QuerySyslog(params web.RequestParams) (*web.PageResult, error) {
+func (m *OperatorManager) QuerySyslog(params web.RequestParams) (*web.PageResult, error) {
 	return m.QueryPagerItems(params, TeamsacsSyslog)
 }

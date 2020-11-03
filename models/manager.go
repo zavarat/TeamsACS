@@ -28,7 +28,6 @@ import (
 
 	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/common/gmail"
-	"github.com/ca17/teamsacs/common/log"
 	"github.com/ca17/teamsacs/common/mongodb"
 	"github.com/ca17/teamsacs/common/tpl"
 	"github.com/ca17/teamsacs/config"
@@ -40,12 +39,9 @@ const (
 	TeamsacsConfig     = "config"
 	TeamsacsOperator   = "operator"
 	TeamsacsSubscribe  = "subscribe"
-	TeamsacsOpslog     = "opslog"
-	TeamsacsLdap       = "ldap"
 	TeamsacsVpe        = "vpe"
 	TeamsacsCpe        = "cpe"
 	TeamsacsOnline     = "online"
-	TeamsacsProfile    = "profile"
 	TeamsacsAccounting = "accounting"
 	TeamsacsAuthlog    = "authlog"
 	TeamsacsSyslog     = "syslog"
@@ -56,7 +52,9 @@ const (
 	GenieacsPresets = "presets"
 )
 
-type Doc = map[string]interface{}
+type Attributes = map[string]interface{}
+
+
 
 type ModelManager struct {
 	Config       *config.AppConfig
@@ -90,24 +88,22 @@ func (m *ModelManager) SetupSyslogDB() {
 	var Capped = true
 	var size = int64(1024 * 64)
 	var max = int64(m.Config.Syslogd.MaxRecodes)
-	err := m.Mongo.Database(MDBTeamsacs).CreateCollection(context.TODO(), TeamsacsSyslog, &options.CreateCollectionOptions{
+	_ = m.Mongo.Database(MDBTeamsacs).CreateCollection(context.TODO(), TeamsacsSyslog, &options.CreateCollectionOptions{
 		Capped:              &Capped,
 		MaxDocuments:        &max,
 		SizeInBytes:         &size,
 	})
-	if err != nil {
-		log.Error(err)
-	}
 }
 
 func (m *ModelManager) registerManagers() {
 	m.ManagerMap.Set("SubscribeManager", &SubscribeManager{m})
 	m.ManagerMap.Set("RadiusManager", &RadiusManager{m})
 	m.ManagerMap.Set("VpeManager", &VpeManager{m})
-	m.ManagerMap.Set("OpsManager", &OpsManager{m})
+	m.ManagerMap.Set("OperatorManager", &OperatorManager{m})
 	m.ManagerMap.Set("CpeManager", &CpeManager{m})
 	m.ManagerMap.Set("ConfigManager", &ConfigManager{m})
 	m.ManagerMap.Set("GenieacsManager", &GenieacsManager{m})
+	m.ManagerMap.Set("DataManager", &DataManager{m})
 }
 
 func (m *ModelManager) GetTeamsAcsCollection(coll string) *mongo.Collection {
@@ -115,7 +111,7 @@ func (m *ModelManager) GetTeamsAcsCollection(coll string) *mongo.Collection {
 }
 
 func (m *ModelManager) GetGenieAcsCollection(coll string) *mongo.Collection {
-	return m.Mongo.Database(MDBTeamsacs).Collection(coll)
+	return m.Mongo.Database(MDBGenieacs).Collection(coll)
 }
 
 func (m *ModelManager) GetTemplateFuncMap() map[string]interface{} {

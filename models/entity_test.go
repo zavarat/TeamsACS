@@ -53,7 +53,6 @@ func TestVpe2json(t *testing.T) {
 		VendorCode: "vendor_code",
 		CoaPort:    3799,
 		Status:     "enabled",
-		LdapId:     "",
 		Remark:     "",
 	}
 	bs, err := json.MarshalIndent(item, "", "\t")
@@ -90,7 +89,6 @@ func TestSubscribe2json(t *testing.T) {
 			InterimInterval: 0,
 			AddrPool:        "N/A",
 			ActiveNum:       1,
-			MfaStatus:       "disabled",
 			UpRate:          1048576,
 			DownRate:        1048576,
 			LimitPolicy:     "N/A",
@@ -101,8 +99,6 @@ func TestSubscribe2json(t *testing.T) {
 		Email:      "test@teamsacs.com",
 		Username:   "test01",
 		Password:   "888888",
-		MfaStatus:  "disabled",
-		MfaSecret:  "N/A",
 		Ipaddr:     "N/A",
 		Macaddr:    "N/A",
 		Vlanid1:    0,

@@ -40,28 +40,39 @@ type Operator struct {
 }
 
 
-type OpsManager struct{ *ModelManager }
+func (a *Operator) AddValidate() error {
+	switch {
+	case common.IsEmptyOrNA(a.Username):
+		return fmt.Errorf("invalid username")
+	case common.IsEmptyOrNA(a.Level):
+		return fmt.Errorf("invalid level")
+	}
+	return nil
+}
 
-func (m *ModelManager) GetOpsManager() *OpsManager {
-	store, _ := m.ManagerMap.Get("OpsManager")
-	return store.(*OpsManager)
+// OperatorManager
+type OperatorManager struct{ *ModelManager }
+
+func (m *ModelManager) GetOpsManager() *OperatorManager {
+	store, _ := m.ManagerMap.Get("OperatorManager")
+	return store.(*OperatorManager)
 }
 
 
 // ExistOperator
-func (m *OpsManager) ExistOperator(username string) bool {
+func (m *OperatorManager) ExistOperator(username string) bool {
 	coll := m.GetTeamsAcsCollection(TeamsacsOperator)
 	count, _ := coll.CountDocuments(context.TODO(), bson.M{"username": username})
 	return count > 0
 }
 
 // QueryOperators
-func (m *OpsManager) QueryOperators(params web.RequestParams) (*web.PageResult, error) {
+func (m *OperatorManager) QueryOperators(params web.RequestParams) (*web.PageResult, error) {
 	return m.QueryPagerItems(params, TeamsacsOperator)
 }
 
 // GetOperator
-func (m *OpsManager) GetOperator(username string) (*Operator, error) {
+func (m *OperatorManager) GetOperator(username string) (*Operator, error) {
 	coll := m.GetTeamsAcsCollection(TeamsacsOperator)
 	doc := coll.FindOne(context.TODO(), bson.M{"username": username})
 	err := doc.Err()
@@ -74,8 +85,8 @@ func (m *OpsManager) GetOperator(username string) (*Operator, error) {
 }
 
 
-// UpdateSubscribe
-func (m *OpsManager) UpdateApiSecret(username string) (string, error) {
+// UpdateApiSecret
+func (m *OperatorManager) UpdateApiSecret(username string) (string, error) {
 	coll := m.GetTeamsAcsCollection(TeamsacsOperator)
 	apisecret := common.UUID()
 	_, err := coll.UpdateOne(context.TODO(), bson.M{"username": username}, bson.M{"$set":bson.M{"api_secret":apisecret}})
@@ -85,7 +96,7 @@ func (m *OpsManager) UpdateApiSecret(username string) (string, error) {
 
 // UpdateOperator
 // update by username
-func (m *OpsManager) UpdateOperator(operator *Operator) error {
+func (m *OperatorManager) UpdateOperator(operator *Operator) error {
 	coll := m.GetTeamsAcsCollection(TeamsacsOperator)
 	query := bson.M{"username": operator.Username}
 	data := bson.M{}
@@ -104,7 +115,7 @@ func (m *OpsManager) UpdateOperator(operator *Operator) error {
 }
 
 // AddOperator
-func (m *OpsManager) AddOperator(operator *Operator) (string, error) {
+func (m *OperatorManager) AddOperator(operator *Operator) (string, error) {
 	if err := operator.AddValidate(); err != nil {
 		return "", err
 	}
@@ -123,7 +134,7 @@ func (m *OpsManager) AddOperator(operator *Operator) (string, error) {
 }
 
 // DeleteSubscribe
-func (m *OpsManager) DeleteOperator(username string) error {
+func (m *OperatorManager) DeleteOperator(username string) error {
 	if common.IsEmptyOrNA(username) {
 		return fmt.Errorf("username is empty or NA")
 	}

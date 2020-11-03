@@ -22,6 +22,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
@@ -61,7 +62,6 @@ func (h *HttpHandler) InitRouter(group *echo.Group) {
 
 }
 
-
 func (h *HttpHandler) GetConfig() *config.AppConfig {
 	return h.Ctx.Config
 }
@@ -83,13 +83,12 @@ func (h *HttpHandler) GetInternalError(err interface{}) *echo.HTTPError {
 func (h *HttpHandler) GoInternalErrPage(c echo.Context, err interface{}) error {
 	switch err.(type) {
 	case error:
-		return c.Render(http.StatusInternalServerError, "err500", map[string]string{"message":err.(error).Error()})
+		return c.Render(http.StatusInternalServerError, "err500", map[string]string{"message": err.(error).Error()})
 	case string:
-		return c.Render(http.StatusInternalServerError, "err500", map[string]string{"message":err.(string)})
+		return c.Render(http.StatusInternalServerError, "err500", map[string]string{"message": err.(string)})
 	}
-	return c.Render(http.StatusInternalServerError, "err500", map[string]string{"message":err.(string)})
+	return c.Render(http.StatusInternalServerError, "err500", map[string]string{"message": err.(string)})
 }
-
 
 func (h *HttpHandler) RestResult(data interface{}) *RestResult {
 	return &RestResult{
@@ -141,7 +140,6 @@ func (h *HttpHandler) GetUserLevel(c echo.Context) string {
 	return level.(string)
 }
 
-
 // Get current api user id
 func (h *HttpHandler) GetUserId(c echo.Context) string {
 	jd := h.GetJwtData(c)
@@ -149,7 +147,7 @@ func (h *HttpHandler) GetUserId(c echo.Context) string {
 	return uid.(string)
 }
 
-func (h *HttpHandler) JsonBodyParse(c echo.Context) (web.RequestParams, error)  {
+func (h *HttpHandler) JsonBodyParse(c echo.Context) (web.RequestParams, error) {
 	body, err := ioutil.ReadAll(c.Request().Body)
 	if err != nil {
 		return nil, err
@@ -161,12 +159,17 @@ func (h *HttpHandler) JsonBodyParse(c echo.Context) (web.RequestParams, error)  
 
 func (h *HttpHandler) RequestParseGet(c echo.Context) web.RequestParams {
 	query := make(web.RequestParams)
+	querymap := make(map[string]interface{})
 	for k, vs := range c.QueryParams() {
-		query[k] = vs[0]
+		if strings.HasPrefix(k, "qs.") || strings.HasPrefix(k, "qs-") || strings.HasPrefix(k, "qs_") {
+			querymap[k[3:]] = vs[0]
+		} else {
+			query[k] = vs[0]
+		}
 	}
+	query["querymap"] = querymap
 	return query
 }
-
 
 func (h *HttpHandler) RequestParse(c echo.Context) web.RequestParams {
 	var params = web.EmptyRequestParams
@@ -180,9 +183,6 @@ func (h *HttpHandler) RequestParse(c echo.Context) web.RequestParams {
 	}
 	return params
 }
-
-
-
 
 type HTTPError struct {
 	Code     int         `json:"-"`

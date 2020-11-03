@@ -28,6 +28,20 @@ import (
 	"github.com/ca17/teamsacs/constant"
 )
 
+// ProfileAttr
+// Radius profile attrs
+type ProfileAttr struct {
+	Domain          string `bson:"domain" json:"domain,omitempty"`
+	InterimInterval int    `bson:"interim_interval" json:"interim_interval,omitempty"`
+	AddrPool        string `bson:"addr_pool" json:"addr_pool,omitempty"`
+	ActiveNum       int    `bson:"active_num" json:"active_num,omitempty"`
+	UpRate          int    `bson:"up_rate" json:"up_rate,omitempty"`
+	DownRate        int    `bson:"down_rate" json:"down_rate,omitempty"`
+	LimitPolicy     string `bson:"limit_policy" json:"limit_policy,omitempty"`
+	UpLimitPolicy   string `bson:"up_limit_policy" json:"up_limit_policy,omitempty"`
+	DownLimitPolicy string `bson:"down_limit_policy" json:"down_limit_policy,omitempty"`
+}
+
 
 // Subscribe
 type Subscribe struct {
@@ -51,6 +65,67 @@ type Subscribe struct {
 }
 
 
+func (a *Subscribe) AddValidate() error {
+	if common.IsEmptyOrNA(a.Username) {
+		return fmt.Errorf("invalid username")
+	}
+	if common.IsEmptyOrNA(a.Password) {
+		return fmt.Errorf("invalid password")
+	}
+	return nil
+}
+
+func (a *Subscribe) UpdateValidate() error {
+	if common.IsEmptyOrNA(a.Username) {
+		return fmt.Errorf("invalid username")
+	}
+	return nil
+}
+
+
+// AuthorizationProfile Method
+func (a Subscribe) GetExpireTime() time.Time {
+	return a.ExpireTime
+}
+
+func (a Subscribe) GetInterimInterval() int {
+	return a.Profile.InterimInterval
+}
+
+func (a Subscribe) GetAddrPool() string {
+	return a.Profile.AddrPool
+}
+
+func (a Subscribe) GetIpaddr() string {
+	return a.Ipaddr
+}
+
+func (a Subscribe) GetUpRateKbps() int {
+	return a.Profile.UpRate
+}
+
+func (a Subscribe) GetDownRateKbps() int {
+	return a.Profile.DownRate
+}
+
+func (a Subscribe) GetDomain() string {
+	return a.Profile.Domain
+}
+
+func (a Subscribe) GetLimitPolicy() string {
+	return a.Profile.LimitPolicy
+}
+
+func (a Subscribe) GetUpLimitPolicy() string {
+	return a.Profile.UpLimitPolicy
+}
+
+func (a Subscribe) GetDownLimitPolicy() string {
+	return a.Profile.DownLimitPolicy
+}
+
+
+// SubscribeManager
 type SubscribeManager struct{ *ModelManager }
 
 func (m *ModelManager) GetSubscribeManager() *SubscribeManager {

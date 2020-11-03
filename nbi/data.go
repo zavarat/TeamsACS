@@ -22,13 +22,17 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/ca17/teamsacs/common"
-	"github.com/ca17/teamsacs/models"
 )
 
-func (h *HttpHandler) QueryConfig(c echo.Context) error {
+
+// A generic data CRUD management API with no predefined schema,
+// storing extra data that you may not use at all, but you'll probably use a lot.
+
+
+// QueryData
+func (h *HttpHandler) QueryData(c echo.Context) error {
 	var result = make(map[string]interface{})
-	params := h.RequestParse(c)
-	data, err := h.GetManager().GetConfigManager().QueryConfig(params)
+	data, err := h.GetManager().GetDataManager().QueryDatas(h.RequestParse(c))
 	if err != nil {
 		return h.GetInternalError(err)
 	}
@@ -36,20 +40,29 @@ func (h *HttpHandler) QueryConfig(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-func (h *HttpHandler) UpdateConfig(c echo.Context) error {
-	item := new(models.Config)
-	common.Must(c.Bind(item))
-	err := h.GetManager().GetConfigManager().UpdateConfigValue(item.Type, item.Name, item.Value)
+// AddData
+func (h *HttpHandler) GetData(c echo.Context) error {
+	r, err := h.GetManager().GetDataManager().GetData(h.RequestParse(c))
 	common.Must(err)
+	return c.JSON(200, h.RestResult(r))
+}
+
+// AddData
+func (h *HttpHandler) AddData(c echo.Context) error {
+	common.Must(h.GetManager().GetDataManager().AddData(h.RequestParse(c)))
+	return c.JSON(200, h.RestSucc("Success"))
+}
+
+// UpdateData
+func (h *HttpHandler) UpdateData(c echo.Context) error {
+	common.Must(h.GetManager().GetDataManager().UpdateData(h.RequestParse(c)))
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }
 
-func (h *HttpHandler) UpdateRadiusConfigs(c echo.Context) error {
-	params := h.RequestParse(c)
-	rps := params.GetParamMap("radius")
-	for k, v := range rps {
-		err := h.GetManager().GetConfigManager().UpdateConfigValue("radius", k, v.(string))
-		common.Must(err)
-	}
+// DeleteData
+func (h *HttpHandler) DeleteData(c echo.Context) error {
+	common.Must(h.GetManager().GetDataManager().DeleteData(h.RequestParse(c)))
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }
+
+

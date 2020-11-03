@@ -227,11 +227,11 @@ var NoValueError = fmt.Errorf("no value")
 func (jp RequestParams) GetMustString(key string) string {
 	v, ok := jp[key]
 	if !ok {
-		common.Must(NoValueError)
+		common.Must(fmt.Errorf(key+" attr no value"))
 	}
 	vv, ok := v.(string)
 	if !ok {
-		common.Must(NoValueError)
+		common.Must(fmt.Errorf(key+" attr not string"))
 	}
 	return vv
 }
@@ -239,7 +239,7 @@ func (jp RequestParams) GetMustString(key string) string {
 func (jp RequestParams) GetMustInt64(key string) int64 {
 	v, ok := jp[key]
 	if !ok {
-		common.Must(NoValueError)
+		common.Must(fmt.Errorf(key+" attr not int64"))
 	}
 	vv, ok := v.(int64)
 	if !ok {

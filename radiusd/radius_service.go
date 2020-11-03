@@ -109,21 +109,21 @@ func (s *RadiusService) GetUserForAcct(username string) (*models.Subscribe, erro
 }
 
 func (s *RadiusService) UpdateUserMac(username string, macaddr string) {
-	err := s.Manager.GetSubscribeManager().UpdateSubscribeByUsername(username, models.Doc{"macaddr": macaddr})
+	err := s.Manager.GetSubscribeManager().UpdateSubscribeByUsername(username, models.Attributes{"macaddr": macaddr})
 	if err != nil {
 		radlog.Warningf("update user:%s mac_addr:%s error", username, macaddr)
 	}
 }
 
 func (s *RadiusService) UpdateUserVlanid1(username string, vlanid1 int) {
-	err := s.Manager.GetSubscribeManager().UpdateSubscribeByUsername(username, models.Doc{"vlanid1": vlanid1})
+	err := s.Manager.GetSubscribeManager().UpdateSubscribeByUsername(username, models.Attributes{"vlanid1": vlanid1})
 	if err != nil {
 		radlog.Warningf("update user:%s vlanid1:%s error", username, vlanid1)
 	}
 }
 
 func (s *RadiusService) UpdateUserVlanid2(username string, vlanid2 int) {
-	err := s.Manager.GetSubscribeManager().UpdateSubscribeByUsername(username, models.Doc{"vlanid2": vlanid2})
+	err := s.Manager.GetSubscribeManager().UpdateSubscribeByUsername(username, models.Attributes{"vlanid2": vlanid2})
 	if err != nil {
 		radlog.Warningf("update user:%s vlanid2:%s error", username, vlanid2)
 	}

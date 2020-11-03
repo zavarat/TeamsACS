@@ -1,0 +1,52 @@
+POST http://{{nbi_url}}/nbi/data/add
+Content-Type: application/json
+authorization: Bearer {{nbi_token}}
+
+{
+  "collname": "test",
+  "data": {
+    "_id": "12345",
+    "name": "xxxxxx"
+  }
+}
+
+###
+
+POST http://{{nbi_url}}/nbi/data/update
+Content-Type: application/json
+authorization: Bearer {{nbi_token}}
+
+{
+  "_id": "12345",
+  "collname": "test",
+  "data": {
+    "name": "xxxxxx222"
+  }
+}
+
+###
+
+POST http://{{nbi_url}}/nbi/data/query
+Content-Type: application/json
+authorization: Bearer {{nbi_token}}
+
+{
+  "collname": "test",
+  "querymap": {
+    "name": "xxxxxx222"
+  }
+}
+
+###
+
+
+GET http://{{nbi_url}}/nbi/data/query?collname=test&count=0
+authorization: Bearer {{nbi_token}}
+
+###
+
+
+GET http://{{nbi_url}}/nbi/data/delete?collname=test&_id=12345
+authorization: Bearer {{nbi_token}}
+
+###
