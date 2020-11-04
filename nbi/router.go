@@ -53,11 +53,12 @@ func (h *HttpHandler) InitAllRouter(e *echo.Echo) {
 	e.POST( "/nbi/opr/update", h.UpdateOperator)
 
 	// opr apis
-	e.Any("/nbi/data/query", h.QueryData)
-	e.Any("/nbi/data/get", h.GetData)
-	e.Any("/nbi/data/delete", h.DeleteData)
-	e.POST( "/nbi/data/add",h.AddData)
-	e.POST( "/nbi/data/update", h.UpdateData)
+	e.Any("/nbi/data/:collname/query", h.QueryData)
+	e.Any("/nbi/data/:collname/options", h.QueryDataOptions)
+	e.Any("/nbi/data/:collname/get", h.GetData)
+	e.Any("/nbi/data/:collname/delete", h.DeleteData)
+	e.POST( "/nbi/data/:collname/add",h.AddData)
+	e.POST( "/nbi/data/:collname/update", h.UpdateData)
 
 	// radius apis
 	e.Any("/nbi/radius/accounting/query", h.QueryRadiusAccounting)

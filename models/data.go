@@ -18,9 +18,11 @@ package models
 
 import (
 	"context"
+	"strings"
 
 	"go.mongodb.org/mongo-driver/bson"
 
+	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/common/web"
 )
 
@@ -39,6 +41,13 @@ func (m *ModelManager) GetDataManager() *DataManager {
 func (m *DataManager) QueryDatas(params web.RequestParams) (*web.PageResult, error) {
 	collname := params.GetMustString("collname")
 	return m.QueryPagerItems(params, collname)
+}
+
+
+// QueryDatas
+func (m *DataManager) QueryDataOptions(params web.RequestParams) ([]web.JsonOptions, error) {
+	collname := params.GetMustString("collname")
+	return m.QueryItemOptions(params, collname)
 }
 
 
@@ -61,7 +70,10 @@ func (m *DataManager) GetData(params web.RequestParams) (*Attributes, error) {
 // AddData
 func (m *DataManager) AddData(params web.RequestParams) error {
 	data := params.GetParamMap("data")
-	_ = data.GetMustString("_id")
+	_id := data.GetString("_id")
+	if common.IsEmptyOrNA(_id) {
+		data["_id"] = common.UUID()
+	}
 	coll := m.GetTeamsAcsCollection(params.GetMustString("collname"))
 	_, err := coll.InsertOne(context.TODO(), data)
 	return err
@@ -69,18 +81,24 @@ func (m *DataManager) AddData(params web.RequestParams) error {
 
 // UpdateData
 func (m *DataManager) UpdateData(params web.RequestParams) error {
-	_id := params.GetMustString("_id")
+	data := params.GetParamMap("data")
+	_id := data.GetMustString("_id")
 	query := bson.M{"_id": _id}
-	update := bson.M{"$set": params.GetParamMap("data")}
+	update := bson.M{"$set": data}
 	_, err := m.GetTeamsAcsCollection(params.GetMustString("collname")).UpdateOne(context.TODO(), query, update)
 	return err
 }
 
 // DeleteData
 func (m *DataManager) DeleteData(params web.RequestParams) error {
-	_id := params.GetMustString("_id")
+	ids := params.GetParamMap("querymap").GetMustString("ids")
+	idarray :=  bson.A{}
+	for _, id := range strings.Split(ids, ",") {
+		idarray = append(idarray, id)
+	}
 	collname := params.GetMustString("collname")
-	_, err := m.GetTeamsAcsCollection(collname).DeleteOne(context.TODO(), bson.M{"_id": _id})
+	filter := bson.M{"_id": bson.M{"$in":idarray}}
+	_, err := m.GetTeamsAcsCollection(collname).DeleteMany(context.TODO(), filter)
 	return err
 }
 

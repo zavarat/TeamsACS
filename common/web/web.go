@@ -156,6 +156,11 @@ var EmptyPageResult = &PageResult{
 	Data:       common.EmptyList,
 }
 
+type JsonOptions struct {
+	Id    string `json:"id"`
+	Value string `json:"value"`
+}
+
 type QueryResult []map[string]interface{}
 
 type RequestParams map[string]interface{}

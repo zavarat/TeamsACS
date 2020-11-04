@@ -60,6 +60,48 @@ func (m *ModelManager) QueryItems(params web.RequestParams, collatiion string) (
 	return &items, nil
 }
 
+
+func (m *ModelManager) QueryItemOptions(params web.RequestParams, collatiion string) ([]web.JsonOptions, error) {
+	jsonoptions := make([]web.JsonOptions,0)
+	var findOptions = options.Find()
+	coll := m.GetTeamsAcsCollection(collatiion)
+	querymap := params.GetParamMap("querymap")
+	optionName := querymap.GetString("optionname")
+	if optionName == "" {
+		return jsonoptions, fmt.Errorf("option name is empty")
+	}
+	var q = bson.M{}
+	for qname, val := range querymap {
+		if qname != "optionname" {
+			q[qname] = val
+		}
+	}
+	cur, err := coll.Find(context.TODO(), q, findOptions)
+	if err != nil {
+		return nil, err
+	}
+	for cur.Next(context.TODO()) {
+		var elem map[string]interface{}
+		err := cur.Decode(&elem)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			optionId := elem["_id"].(string)
+			optionValue := elem[optionName]
+			if optionValue == nil || optionValue == "" {
+				continue
+			}
+			jsonoptions = append(jsonoptions, web.JsonOptions{
+				Id:    optionId,
+				Value: optionValue.(string),
+			})
+		}
+	}
+	return jsonoptions, nil
+}
+
+
+
 func (m *ModelManager) QueryPagerItems(params web.RequestParams, collatiion string) (*web.PageResult, error) {
 	var findOptions = options.Find()
 	var pos = params.GetInt64WithDefval("start", 0)

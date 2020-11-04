@@ -22,7 +22,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
@@ -161,14 +160,25 @@ func (h *HttpHandler) RequestParseGet(c echo.Context) web.RequestParams {
 	query := make(web.RequestParams)
 	querymap := make(map[string]interface{})
 	for k, vs := range c.QueryParams() {
-		if strings.HasPrefix(k, "qs.") || strings.HasPrefix(k, "qs-") || strings.HasPrefix(k, "qs_") {
-			querymap[k[3:]] = vs[0]
-		} else {
+		if common.InSlice(k, []string{"start", "count"}){
 			query[k] = vs[0]
+		} else if vs[0] != "" {
+			querymap[k] = vs[0]
 		}
 	}
 	query["querymap"] = querymap
 	return query
+}
+
+func (h *HttpHandler) RequestParseForm(c echo.Context) web.RequestParams {
+	params := make(web.RequestParams)
+	data := make(map[string]interface{})
+	posts, _ := c.FormParams()
+	for k, vs := range posts {
+		data[k] = vs[0]
+	}
+	params["data"] = data
+	return params
 }
 
 func (h *HttpHandler) RequestParse(c echo.Context) web.RequestParams {
@@ -178,8 +188,13 @@ func (h *HttpHandler) RequestParse(c echo.Context) web.RequestParams {
 	case http.MethodGet:
 		params = h.RequestParseGet(c)
 	case http.MethodPost, http.MethodPut:
-		params, err = h.JsonBodyParse(c)
-		common.Must(err)
+		ctype := c.Request().Header.Get("Content-Type")
+		if ctype == "application/json" {
+			params, err = h.JsonBodyParse(c)
+			common.Must(err)
+		}else if ctype == "application/x-www-form-urlencoded" {
+			params = h.RequestParseForm(c)
+		}
 	}
 	return params
 }

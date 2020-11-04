@@ -133,7 +133,7 @@ var DefaultAppConfig = &AppConfig{
 		Host:      "0.0.0.0",
 		Port:      1979,
 		Debug:     true,
-		JwtSecret: "9b6de5cc07384bf1acs10f568ac9da37",
+		JwtSecret: "9b6de5cc-0731-4bf1-zpms-0f568ac9da37",
 	},
 	Freeradius: FreeradiusConfig{
 		Host:  "0.0.0.0",

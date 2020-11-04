@@ -31,37 +31,52 @@ import (
 
 // QueryData
 func (h *HttpHandler) QueryData(c echo.Context) error {
-	var result = make(map[string]interface{})
-	data, err := h.GetManager().GetDataManager().QueryDatas(h.RequestParse(c))
-	if err != nil {
-		return h.GetInternalError(err)
-	}
-	result["data"] = data
-	return c.JSON(http.StatusOK, result)
+	params := h.RequestParse(c)
+	params["collname"] = c.Param("collname")
+	data, err := h.GetManager().GetDataManager().QueryDatas(params)
+	common.Must(err)
+	return c.JSON(http.StatusOK, data)
+}
+
+// QueryData
+func (h *HttpHandler) QueryDataOptions(c echo.Context) error {
+	params := h.RequestParse(c)
+	params["collname"] = c.Param("collname")
+	data, err := h.GetManager().GetDataManager().QueryDataOptions(params)
+	common.Must(err)
+	return c.JSON(http.StatusOK, data)
 }
 
 // AddData
 func (h *HttpHandler) GetData(c echo.Context) error {
-	r, err := h.GetManager().GetDataManager().GetData(h.RequestParse(c))
+	params := h.RequestParse(c)
+	params["collname"] = c.Param("collname")
+	r, err := h.GetManager().GetDataManager().GetData(params)
 	common.Must(err)
-	return c.JSON(200, h.RestResult(r))
+	return c.JSON(http.StatusOK, h.RestResult(r))
 }
 
 // AddData
 func (h *HttpHandler) AddData(c echo.Context) error {
-	common.Must(h.GetManager().GetDataManager().AddData(h.RequestParse(c)))
-	return c.JSON(200, h.RestSucc("Success"))
+	params := h.RequestParse(c)
+	params["collname"] = c.Param("collname")
+	common.Must(h.GetManager().GetDataManager().AddData(params))
+	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }
 
 // UpdateData
 func (h *HttpHandler) UpdateData(c echo.Context) error {
-	common.Must(h.GetManager().GetDataManager().UpdateData(h.RequestParse(c)))
+	params := h.RequestParse(c)
+	params["collname"] = c.Param("collname")
+	common.Must(h.GetManager().GetDataManager().UpdateData(params))
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }
 
 // DeleteData
 func (h *HttpHandler) DeleteData(c echo.Context) error {
-	common.Must(h.GetManager().GetDataManager().DeleteData(h.RequestParse(c)))
+	params := h.RequestParse(c)
+	params["collname"] = c.Param("collname")
+	common.Must(h.GetManager().GetDataManager().DeleteData(params))
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }
 

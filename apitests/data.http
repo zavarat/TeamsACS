@@ -1,4 +1,4 @@
-POST http://{{nbi_url}}/nbi/data/add
+POST http://{{nbi_url}}/nbi/data/test/add
 Content-Type: application/json
 authorization: Bearer {{nbi_token}}
 
@@ -12,7 +12,7 @@ authorization: Bearer {{nbi_token}}
 
 ###
 
-POST http://{{nbi_url}}/nbi/data/update
+POST http://{{nbi_url}}/nbi/data/test/update
 Content-Type: application/json
 authorization: Bearer {{nbi_token}}
 
@@ -26,14 +26,14 @@ authorization: Bearer {{nbi_token}}
 
 ###
 
-POST http://{{nbi_url}}/nbi/data/query
+POST http://{{nbi_url}}/nbi/data/test/query
 Content-Type: application/json
 authorization: Bearer {{nbi_token}}
 
 {
   "collname": "test",
   "querymap": {
-    "name": "xxxxxx222"
+    "name": "xxxxxx"
   }
 }
 
@@ -41,6 +41,11 @@ authorization: Bearer {{nbi_token}}
 
 
 GET http://{{nbi_url}}/nbi/data/query?collname=test&count=0
+authorization: Bearer {{nbi_token}}
+
+###
+
+GET http://{{nbi_url}}/nbi/data/test/options?optionname=name
 authorization: Bearer {{nbi_token}}
 
 ###
