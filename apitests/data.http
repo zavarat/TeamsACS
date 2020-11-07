@@ -40,12 +40,18 @@ authorization: Bearer {{nbi_token}}
 ###
 
 
+GET http://{{nbi_url}}/nbi/data/test/get?collname=test&_id=12345
+authorization: Bearer {{nbi_token}}
+
+###
+
+
 GET http://{{nbi_url}}/nbi/data/query?collname=test&count=0
 authorization: Bearer {{nbi_token}}
 
 ###
 
-GET http://{{nbi_url}}/nbi/data/test/options?optionname=name
+GET http://{{nbi_url}}/nbi/data/customer/options?optionname=name
 authorization: Bearer {{nbi_token}}
 
 ###

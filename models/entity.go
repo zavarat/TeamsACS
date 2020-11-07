@@ -16,33 +16,62 @@
 
 package models
 
+import (
+	"strconv"
+	"time"
+)
 
-type CollTemplate struct {
-	ID    string     `bson:"_id,omitempty" json:"id,omitempty"`
-	Attrs Attributes `bson:"attrs" json:"attrs,omitempty"`
+type DataObject map[string]string
+
+func (d DataObject) GetStringValue(key string, defval string) string {
+	val, ok := d[key]
+	if !ok || val == "" {
+		return defval
+	}
+	return val
 }
 
-// VariableConfig
-type VariableConfig struct {
-	ID     string     `bson:"_id,omitempty" json:"id,omitempty"`
-	Vendor string     `bson:"vendor" json:"vendor,omitempty"`
-	Group  string     `bson:"group" json:"group,omitempty"`
-	Attrs  Attributes `bson:"attrs" json:"attrs,omitempty"`
-	Remark string     `bson:"remark" json:"remark,omitempty"`
+func (d DataObject) GetInt64Value(key string, defval int64) int64 {
+	val, ok := d[key]
+	if ok {
+		v, err := strconv.ParseInt(val, 10, 64)
+		if err != nil {
+			return defval
+		}
+		return v
+	}
+	return defval
 }
 
-// AppTemplate
-// Application template, defining an application specification
-type AppTemplate struct {
-	ID    string     `bson:"_id,omitempty" json:"id,omitempty"`
-	Attrs Attributes `bson:"attrs" json:"attrs,omitempty"`
+func (d DataObject) GetIntValue(key string, defval int) int {
+	val, ok := d[key]
+	if ok {
+		v, err := strconv.Atoi(val)
+		if err != nil {
+			return defval
+		}
+		return v
+	}
+	return defval
 }
 
-// AppGroup
-// Creating a set of application specifications through application templates
-type AppGroup struct {
-	ID   string       `bson:"_id,omitempty" json:"id,omitempty"`
-	Name string       `bson:"name,omitempty" json:"name,omitempty"`
-	Apps []Attributes `bson:"apps" json:"apps,omitempty"`
+
+func (d DataObject) GetDateValue(key string, defval time.Time) time.Time {
+	val, ok := d[key]
+	if ok {
+		var result = defval
+		var err error
+		if len(val) == 19 {
+			result, err = time.Parse("2006-01-02 15:04:05", val)
+		}else{
+			result, err = time.Parse("2006-01-02 15:04:05 Z0700 MST", val)
+		}
+		if err != nil {
+			return defval
+		}
+		return result
+	}
+	return defval
 }
+
 

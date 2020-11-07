@@ -208,9 +208,15 @@ func (jp RequestParams) GetInt64(key string) int64 {
 	if !ok {
 		return 0
 	}
-	vv, ok := v.(int64)
-	if ok {
-		return vv
+	switch v.(type) {
+	case int64:
+		return  v.(int64)
+	case string:
+		vvv, err := strconv.ParseInt(v.(string), 10, 64)
+		if err != nil {
+			return 0
+		}
+		return vvv
 	}
 	return 0
 }
@@ -220,9 +226,15 @@ func (jp RequestParams) GetInt64WithDefval(key string, devfval int64) int64 {
 	if !ok {
 		return devfval
 	}
-	vv, ok := v.(int64)
-	if ok {
-		return vv
+	switch v.(type) {
+	case int64:
+		return  v.(int64)
+	case string:
+		vvv, err := strconv.ParseInt(v.(string), 10, 64)
+		if err != nil {
+			return devfval
+		}
+		return vvv
 	}
 	return devfval
 }

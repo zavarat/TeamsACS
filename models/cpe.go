@@ -18,25 +18,14 @@ package models
 
 import (
 	"context"
-	"fmt"
-	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 
-	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/common/web"
 )
 
 // Cpe
-// attrs: Extended Attributes
-type Cpe struct {
-	Id         string     `bson:"_id,omitempty" json:"id,omitempty"`
-	Sn         string     `bson:"sn" json:"sn,omitempty"`
-	DeviceId   string     `bson:"device_id" json:"device_id,omitempty" `
-	Attrs      Attributes `bson:"attrs" json:"attrs,omitempty" `
-	CreateTime time.Time  `bson:"create_time" json:"create_time,omitempty" `
-	UpdateTime time.Time  `bson:"update_time" json:"update_time,omitempty" `
-}
+type Cpe = DataObject
 
 type CpeManager struct{ *ModelManager }
 
@@ -77,41 +66,4 @@ func (m *CpeManager) ExistCpe(sn string) bool {
 	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
 	count, _ := coll.CountDocuments(context.TODO(), bson.M{"sn": sn})
 	return count > 0
-}
-
-func (m *CpeManager) AddCpe(cpe *Cpe) error {
-	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
-	if m.ExistCpe(cpe.Sn) {
-		return fmt.Errorf("cpe exists")
-	}
-	cpe.CreateTime = time.Now()
-	cpe.UpdateTime = time.Now()
-	cpe.Attrs = make(Attributes)
-	_, err := coll.InsertOne(context.TODO(), cpe)
-	return err
-}
-
-func (m *CpeManager) UpdateCpe(params web.RequestParams) error {
-	sn := params.GetString("sn")
-	if common.IsEmptyOrNA(sn) {
-		return fmt.Errorf("sn is empty or NA")
-	}
-	data := bson.M{
-		"update_time": time.Now(),
-	}
-	for k, v := range params.GetParamMap("attrs") {
-		data["attrs."+k] = v
-	}
-	query := bson.M{"sn": sn}
-	update := bson.M{"$set": data}
-	_, err := m.GetTeamsAcsCollection(TeamsacsCpe).UpdateOne(context.TODO(), query, update)
-	return err
-}
-
-func (m *CpeManager) DeleteCpe(sn string) error {
-	if common.IsEmptyOrNA(sn) {
-		return fmt.Errorf("sn is empty or NA")
-	}
-	_, err := m.GetTeamsAcsCollection(TeamsacsCpe).DeleteOne(context.TODO(), bson.M{"sn": sn})
-	return err
 }

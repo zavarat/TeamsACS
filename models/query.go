@@ -21,14 +21,16 @@ import (
 	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
+	"github.com/ca17/teamsacs/common/log"
 	"github.com/ca17/teamsacs/common/web"
 )
 
 type QueryForm struct {
-	Sort    string `query:"sort" form:"sort"`
-	Size    int64 `query:"size" form:"size"`
+	Sort string `query:"sort" form:"sort"`
+	Size int64  `query:"size" form:"size"`
 }
 
 type SubscribeQueryForm struct {
@@ -36,13 +38,31 @@ type SubscribeQueryForm struct {
 	Username string `query:"username" form:"username"`
 }
 
+
+func processQueryParams(params web.RequestParams, findOptions *options.FindOptions) bson.D {
+	var q = bson.D{}
+	for qname, val := range params.GetParamMap("filtermap") {
+		if qname == "remark" {
+			_filter := bson.D{{"$regex", primitive.Regex{Pattern: val.(string), Options: "i"}}}
+			q = append(q, bson.E{Key: qname, Value: _filter})
+		} else {
+			q = append(q, bson.E{Key: qname, Value: val})
+		}
+	}
+	for sname, sval := range params.GetParamMap("sortmap") {
+		if sval == "asc" {
+			findOptions.SetSort(bson.D{{sname, 1}})
+		} else if sval == "desc" {
+			findOptions.SetSort(bson.D{{sname, -1}})
+		}
+	}
+	return q
+}
+
 func (m *ModelManager) QueryItems(params web.RequestParams, collatiion string) (*web.QueryResult, error) {
 	var findOptions = options.Find()
 	coll := m.GetTeamsAcsCollection(collatiion)
-	var q = bson.M{}
-	for qname, val := range params.GetParamMap("querymap") {
-		q[qname] = val
-	}
+	q := processQueryParams(params, findOptions)
 	cur, err := coll.Find(context.TODO(), q, findOptions)
 	if err != nil {
 		return nil, err
@@ -52,7 +72,7 @@ func (m *ModelManager) QueryItems(params web.RequestParams, collatiion string) (
 		var elem map[string]interface{}
 		err := cur.Decode(&elem)
 		if err != nil {
-			fmt.Println(err)
+			log.Error(err)
 		} else {
 			items = append(items, elem)
 		}
@@ -61,8 +81,9 @@ func (m *ModelManager) QueryItems(params web.RequestParams, collatiion string) (
 }
 
 
+
 func (m *ModelManager) QueryItemOptions(params web.RequestParams, collatiion string) ([]web.JsonOptions, error) {
-	jsonoptions := make([]web.JsonOptions,0)
+	jsonoptions := make([]web.JsonOptions, 0)
 	var findOptions = options.Find()
 	coll := m.GetTeamsAcsCollection(collatiion)
 	querymap := params.GetParamMap("querymap")
@@ -70,12 +91,11 @@ func (m *ModelManager) QueryItemOptions(params web.RequestParams, collatiion str
 	if optionName == "" {
 		return jsonoptions, fmt.Errorf("option name is empty")
 	}
-	var q = bson.M{}
-	for qname, val := range querymap {
-		if qname != "optionname" {
-			q[qname] = val
-		}
+	var q = bson.D{}
+	for qname, val := range params.GetParamMap("filtermap") {
+		q = append(q, bson.E{Key: qname, Value: val})
 	}
+
 	cur, err := coll.Find(context.TODO(), q, findOptions)
 	if err != nil {
 		return nil, err
@@ -84,7 +104,7 @@ func (m *ModelManager) QueryItemOptions(params web.RequestParams, collatiion str
 		var elem map[string]interface{}
 		err := cur.Decode(&elem)
 		if err != nil {
-			fmt.Println(err)
+			log.Error(err)
 		} else {
 			optionId := elem["_id"].(string)
 			optionValue := elem[optionName]
@@ -100,18 +120,13 @@ func (m *ModelManager) QueryItemOptions(params web.RequestParams, collatiion str
 	return jsonoptions, nil
 }
 
-
-
 func (m *ModelManager) QueryPagerItems(params web.RequestParams, collatiion string) (*web.PageResult, error) {
 	var findOptions = options.Find()
 	var pos = params.GetInt64WithDefval("start", 0)
 	findOptions.SetSkip(pos)
 	findOptions.SetLimit(params.GetInt64WithDefval("count", 40))
 	coll := m.GetTeamsAcsCollection(collatiion)
-	var q = bson.M{}
-	for qname, val := range params.GetParamMap("querymap") {
-		q[qname] = val
-	}
+	q := processQueryParams(params, findOptions)
 	cur, err := coll.Find(context.TODO(), q, findOptions)
 	if err != nil {
 		return nil, err
@@ -126,7 +141,7 @@ func (m *ModelManager) QueryPagerItems(params web.RequestParams, collatiion stri
 		var elem map[string]interface{}
 		err := cur.Decode(&elem)
 		if err != nil {
-			fmt.Println(err)
+			log.Error(err)
 		} else {
 			items = append(items, elem)
 		}

@@ -26,6 +26,7 @@ import (
 	"github.com/ca17/teamsacs/common/log"
 	"github.com/ca17/teamsacs/common/validutil"
 	"github.com/ca17/teamsacs/common/web"
+	"github.com/ca17/teamsacs/constant"
 
 	"github.com/labstack/echo/v4"
 )
@@ -79,13 +80,14 @@ func (h *HttpHandler) FreeradiusAuthorize(c echo.Context) error {
 	}
 
 	// Check user status
-	if user.Status == "disabled" {
+	if user.GetStringValue("status", constant.DISABLED) == constant.DISABLED {
 		h.AddAuthlog(username, nasip, RadiusAuthFailure, "user disabled", RadiusAuthlogLevel, time.Since(start).Milliseconds())
 		return c.JSON(501, echo.Map{"Reply-Message": "user status disabled, reject auth"})
 	}
 
+	var expireTime = user.GetExpireTime()
 	// Check user expiration
-	if user.ExpireTime.Before(time.Now()) {
+	if expireTime.Before(time.Now()) {
 		h.AddAuthlog(username, nasip, RadiusAuthFailure, "user expire", RadiusAuthlogLevel, time.Since(start).Milliseconds())
 		return c.JSON(501, echo.Map{"Reply-Message": "user expire, reject auth"})
 	}
@@ -97,23 +99,27 @@ func (h *HttpHandler) FreeradiusAuthorize(c echo.Context) error {
 		h.AddAuthlog(username, nasip, RadiusAuthFailure, "user query count err"+err.Error(), RadiusAuthlogLevel, time.Since(start).Milliseconds())
 		return c.JSON(501, echo.Map{"Reply-Message": "user online count fetch error, reject auth, " + err.Error()})
 	}
-	if count > 0 && user.Profile.ActiveNum > 0 && count >= int64(user.Profile.ActiveNum) {
+	var activeNum = user.GetIntValue("active_num", 0)
+	if count > 0 && activeNum > 0 && count >= int64(activeNum) {
 		h.AddAuthlog(username, nasip, RadiusAuthFailure, "user online limit", RadiusAuthlogLevel, time.Since(start).Milliseconds())
 		return c.JSON(501, echo.Map{"Reply-Message": "user online over limit, reject auth"})
 	}
 
 	// freeradius response
+	var password = user.GetStringValue("password","******")
 	resp := map[string]interface{}{}
-	resp["control:Cleartext-Password"] = strings.TrimSpace(user.Password)
-	resp["reply:Mikrotik-Rate-Limit"] = fmt.Sprintf("%dk/%dk", user.Profile.UpRate, user.Profile.DownRate)
-	sessionTimeout := user.ExpireTime.Sub(time.Now()).Seconds()
+	resp["control:Cleartext-Password"] = strings.TrimSpace(password)
+	resp["reply:Mikrotik-Rate-Limit"] = fmt.Sprintf("%dk/%dk", user.GetUpRateKbps(), user.GetDownRateKbps())
+	sessionTimeout := expireTime.Sub(time.Now()).Seconds()
 	resp["reply:Session-Timeout"] = fmt.Sprintf("%d", int64(sessionTimeout))
 
 	// Set address pool or static IP
-	if common.IsNotEmptyAndNA(user.Ipaddr) && validutil.IsIP(user.Ipaddr){
-		resp["Framed-IP-Address"] = user.Ipaddr
-	} else if common.IsNotEmptyAndNA(user.Profile.AddrPool){
-		resp["Framed-Pool"] = user.Profile.AddrPool
+	var userip = user.GetIpaddr()
+	var addrpool = user.GetAddrPool()
+	if common.IsNotEmptyAndNA(userip) && validutil.IsIP(userip){
+		resp["Framed-IP-Address"] = userip
+	} else if common.IsNotEmptyAndNA(addrpool){
+		resp["Framed-Pool"] = addrpool
 	}
 
 	h.AddAuthlog(username, nasip, RadiusAuthSucces, RadiusAuthSucces, RadiusAuthlogLevel, time.Since(start).Milliseconds())

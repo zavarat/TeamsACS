@@ -56,11 +56,11 @@ func (s *AuthService) ServeRADIUS(w radius.ResponseWriter, r *radius.Request) {
 	s.CheckRadAuthError(start, username, ip, err)
 
 	//  setup new packet secret
-	r.Secret = []byte(vpe.Secret)
-	r.Packet.Secret = []byte(vpe.Secret)
+	r.Secret = []byte(vpe.GetSecret())
+	r.Packet.Secret = []byte(vpe.GetSecret())
 	response := r.Response(radius.CodeAccessAccept)
 
-	vendorReq := radparser.ParseVendor(r, vpe.VendorCode)
+	vendorReq := radparser.ParseVendor(r, vpe.GetVendorCode())
 
 	// ----------------------------------------------------------------------------------------------------
 	// Fetch validate user
@@ -68,16 +68,16 @@ func (s *AuthService) ServeRADIUS(w radius.ResponseWriter, r *radius.Request) {
 	user, err := s.GetUser(username, isMacAuth)
 	s.CheckRadAuthError(start, username, ip, err)
 
+	activeNum := user.GetActiveNum()
 	if !isMacAuth {
-
-		if user.Profile.ActiveNum != 0 {
-			onlineCount, _ := s.Manager.GetRadiusManager().GetOnlineCount(user.Username)
-			if int(onlineCount) > user.Profile.ActiveNum {
-				s.CheckRadAuthError(start, username, ip, fmt.Errorf("user:%s active num over limit(max=%d)", user.Username, user.Profile.ActiveNum))
+		if activeNum != 0 {
+			onlineCount, _ := s.Manager.GetRadiusManager().GetOnlineCount(username)
+			if int(onlineCount) > activeNum {
+				s.CheckRadAuthError(start, username, ip, fmt.Errorf("user:%s active num over limit(max=%d)", username, activeNum))
 			}
 		}
 
-		s.CheckRadAuthError(start, username, ip, s.CheckOnlineCount(username, user.Profile.ActiveNum))
+		s.CheckRadAuthError(start, username, ip, s.CheckOnlineCount(username, activeNum))
 
 		// Username Mac bind check
 		s.CheckRadAuthError(start, username, ip, s.CheckMacBind(user, vendorReq))
@@ -90,10 +90,10 @@ func (s *AuthService) ServeRADIUS(w radius.ResponseWriter, r *radius.Request) {
 	// if mschapv2 auth, will set accept attribute
 	localpwd, err := s.GetLocalPassword(user, isMacAuth)
 	s.CheckRadAuthError(start, username, ip, err)
-	s.CheckRadAuthError(start, username, ip, s.CheckPassword(r, user.Username, localpwd, response, isMacAuth))
+	s.CheckRadAuthError(start, username, ip, s.CheckPassword(r, username, localpwd, response, isMacAuth))
 
 	// setup accept
-	authorization.UpdateAuthorization(user, vpe.VendorCode, response)
+	authorization.UpdateAuthorization(user, vpe.GetVendorCode(), response)
 
 	// send accept
 	s.SendAccept(w, r, response)

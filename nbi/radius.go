@@ -25,29 +25,23 @@ import (
 )
 
 func (h *HttpHandler) QueryRadiusAccounting(c echo.Context) error {
-	var result = make(map[string]interface{})
 	params := h.RequestParse(c)
 	data, err := h.GetManager().GetRadiusManager().QueryAccountings(params)
 	common.Must(err)
-	result["data"] = data
-	return c.JSON(http.StatusOK, result)
+	return c.JSON(http.StatusOK, data)
 }
 
 func (h *HttpHandler) QueryRadiusAuthlog(c echo.Context) error {
-	var result = make(map[string]interface{})
 	params := h.RequestParse(c)
 	data, err := h.GetManager().GetRadiusManager().QueryAuthlogs(params)
 	common.Must(err)
-	result["data"] = data
-	return c.JSON(http.StatusOK, result)
+	return c.JSON(http.StatusOK, data)
 }
 
 func (h *HttpHandler) QueryRadiusOnline(c echo.Context) error {
-	var result = make(map[string]interface{})
 	params := h.RequestParse(c)
 	data, err := h.GetManager().GetRadiusManager().QueryOnlines(params)
 	common.Must(err)
-	result["data"] = data
-	return c.JSON(http.StatusOK, result)
+	return c.JSON(http.StatusOK, data)
 }
 

@@ -74,6 +74,19 @@ func (m *ModelManager) GetRadiusManager() *RadiusManager {
 	return store.(*RadiusManager)
 }
 
+
+func (m *RadiusManager) GetOnlineCount(username string) (int64, error) {
+	coll := m.GetTeamsAcsCollection(TeamsacsOnline)
+	return coll.CountDocuments(context.TODO(), bson.M{"username": username})
+}
+
+
+func (m *RadiusManager) GetOnlineCountBySessionid(acct_session_id string) (int64, error) {
+	coll := m.GetTeamsAcsCollection(TeamsacsOnline)
+	return coll.CountDocuments(context.TODO(), bson.M{"acct_session_id": acct_session_id})
+}
+
+
 func (m *RadiusManager) QueryAccountings(params web.RequestParams) (*web.PageResult, error) {
 	return m.QueryPagerItems(params, TeamsacsAccounting)
 }

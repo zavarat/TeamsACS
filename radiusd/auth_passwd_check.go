@@ -20,11 +20,11 @@ import (
 
 func (s *AuthService) GetLocalPassword(user *models.Subscribe, isMacAuth bool) (string,error) {
 	if isMacAuth {
-		return user.Macaddr, nil
+		return user.GetMacAddr(), nil
 	}
-	localpwd, err := aes.DecryptFromB64(user.Password, s.GetAppConfig().System.Aeskey)
+	localpwd, err := aes.DecryptFromB64(user.GetPassword(), s.GetAppConfig().System.Aeskey)
 	if err != nil {
-		return "", fmt.Errorf("user:%s local password is invalid", user.Username)
+		return "", fmt.Errorf("user:%s local password is invalid", user.GetUsername())
 	}
 	return localpwd, nil
 }

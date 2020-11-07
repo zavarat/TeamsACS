@@ -44,8 +44,8 @@ func (s *AcctService) ServeRADIUS(w radius.ResponseWriter, r *radius.Request) {
 	radlog.CheckError(err)
 
 	// 重新设置数据报文秘钥
-	r.Secret = []byte(vpe.Secret)
-	r.Packet.Secret = []byte(vpe.Secret)
+	r.Secret = []byte(vpe.GetSecret())
+	r.Packet.Secret = []byte(vpe.GetSecret())
 
 	// 用户名检查
 	username := rfc2865.UserName_GetString(r.Packet)
@@ -53,7 +53,7 @@ func (s *AcctService) ServeRADIUS(w radius.ResponseWriter, r *radius.Request) {
 		radlog.CheckError(errors.New("username is empty"))
 	}
 
-	vendorReq := radparser.ParseVendor(r, vpe.VendorCode)
+	vendorReq := radparser.ParseVendor(r, vpe.GetVendorCode())
 
 	// 获取有效用户
 	user, err := s.GetUserForAcct(username)
@@ -62,11 +62,11 @@ func (s *AcctService) ServeRADIUS(w radius.ResponseWriter, r *radius.Request) {
 	statusType := rfc2866.AcctStatusType_Get(r.Packet)
 	switch statusType {
 	case rfc2866.AcctStatusType_Value_Start:
-		s.processAcctStart(r, vendorReq, user.Username, vpe, nasrip)
+		s.processAcctStart(r, vendorReq, user.GetUsername(), vpe, nasrip)
 	case rfc2866.AcctStatusType_Value_InterimUpdate:
 		s.processAcctUpdateBefore(r, vendorReq, user, vpe, nasrip)
 	case rfc2866.AcctStatusType_Value_Stop:
-		s.processAcctStop(r, vendorReq, user.Username, vpe, nasrip)
+		s.processAcctStop(r, vendorReq, user.GetUsername(), vpe, nasrip)
 	case rfc2866.AcctStatusType_Value_AccountingOn:
 		s.processAcctNasOn(r)
 	case rfc2866.AcctStatusType_Value_AccountingOff:

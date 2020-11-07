@@ -27,16 +27,17 @@ func (s *AcctService) processAcctStart(r *radius.Request, vr *radparser.VendorRe
 
 func (s *AcctService) processAcctUpdateBefore(r *radius.Request, vr *radparser.VendorRequest,  user *models.Subscribe, vpe *models.Vpe, nasrip string) {
 	// 用户状态变更为停用后触发下线
-	if user.Status == constant.DISABLED {
-		s.processAcctDisconnect(r, vpe, user.Username, nasrip)
+	var username = user.GetStringValue("username",constant.NA)
+	if user.GetStringValue("status", constant.DISABLED) == constant.DISABLED {
+		s.processAcctDisconnect(r, vpe, username, nasrip)
 	}
 
 	// 用户过期后触发下线
-	if user.ExpireTime.Before(time.Now()) {
-		s.processAcctDisconnect(r, vpe, user.Username, nasrip)
+	if user.GetExpireTime().Before(time.Now()) {
+		s.processAcctDisconnect(r, vpe, username, nasrip)
 	}
 
-	s.processAcctUpdate(r, vr, user.Username, vpe, nasrip)
+	s.processAcctUpdate(r, vr, username, vpe, nasrip)
 }
 
 
@@ -84,7 +85,7 @@ func (s *AcctService) processAcctNasOff(r *radius.Request) {
 
 
 func (s *AcctService) processAcctDisconnect(r *radius.Request, vpe *models.Vpe, username, nasrip string) {
-	packet := radius.New(radius.CodeDisconnectRequest, []byte(vpe.Secret))
+	packet := radius.New(radius.CodeDisconnectRequest, []byte(vpe.GetStringValue("secret",constant.NA)))
 	sessionid := rfc2866.AcctSessionID_GetString(r.Packet)
 	if sessionid == "" {
 		radlog.Errorf("radius disconnect user:%s, but sessionid is empty", username)
@@ -92,10 +93,11 @@ func (s *AcctService) processAcctDisconnect(r *radius.Request, vpe *models.Vpe, 
 	}
 	_ = rfc2865.UserName_SetString(packet, username)
 	_ = rfc2866.AcctSessionID_Set(packet, []byte(sessionid))
-	radlog.Infof("disconnect user:%s => (%s:%d): %s", username, nasrip, vpe.CoaPort, debug.FormatPacket(packet))
-	response, err := radius.Exchange(context.Background(), packet, fmt.Sprintf("%s:%d", nasrip, vpe.CoaPort))
+	var coaPort = vpe.GetIntValue("coa_port", 3799)
+	radlog.Infof("disconnect user:%s => (%s:%d): %s", username, nasrip, coaPort, debug.FormatPacket(packet))
+	response, err := radius.Exchange(context.Background(), packet, fmt.Sprintf("%s:%d", nasrip, coaPort))
 	if err != nil {
 		radlog.Errorf("radius disconnect user:%s failure", username)
 	}
-	radlog.Info("radius disconnect resp from (%s:%s): %s ", nasrip, vpe.CoaPort, debug.FormatPacket(response))
+	radlog.Info("radius disconnect resp from (%s:%s): %s ", nasrip, coaPort, debug.FormatPacket(response))
 }

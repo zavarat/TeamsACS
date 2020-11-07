@@ -32,14 +32,12 @@ func (h *HttpHandler) QueryOperator(c echo.Context) error {
 	if h.GetUserLevel(c) != constant.NBIAdminLevel {
 		return c.NoContent(http.StatusForbidden)
 	}
-	var result = make(map[string]interface{})
 	params := h.RequestParse(c)
 	data, err := h.GetManager().GetOpsManager().QueryOperators(params)
 	if err != nil {
 		return h.GetInternalError(err)
 	}
-	result["data"] = data
-	return c.JSON(http.StatusOK, result)
+	return c.JSON(http.StatusOK, data)
 }
 
 // AddOperator

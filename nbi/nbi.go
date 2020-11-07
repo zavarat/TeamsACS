@@ -22,12 +22,14 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
 
 	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/common/web"
+	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/ca17/teamsacs/config"
 	"github.com/ca17/teamsacs/models"
 )
@@ -159,14 +161,22 @@ func (h *HttpHandler) JsonBodyParse(c echo.Context) (web.RequestParams, error) {
 func (h *HttpHandler) RequestParseGet(c echo.Context) web.RequestParams {
 	query := make(web.RequestParams)
 	querymap := make(map[string]interface{})
+	filtermap := make(map[string]interface{})
+	sortmap := make(map[string]interface{})
 	for k, vs := range c.QueryParams() {
 		if common.InSlice(k, []string{"start", "count"}){
 			query[k] = vs[0]
-		} else if vs[0] != "" {
+		} else if strings.HasPrefix(k, "filter[") && vs[0] != ""{
+			filtermap[k[7:len(k)-1]] = vs[0]
+		} else if strings.HasPrefix(k, "sort[") && vs[0] != ""{
+			sortmap[k[5:len(k)-1]] = vs[0]
+		}else if vs[0] != "" {
 			querymap[k] = vs[0]
 		}
 	}
 	query["querymap"] = querymap
+	query["filtermap"] = filtermap
+	query["sortmap"] = sortmap
 	return query
 }
 
@@ -215,4 +225,42 @@ func NewHTTPError(code int, message ...interface{}) *HTTPError {
 
 func (e *HTTPError) Error() string {
 	return fmt.Sprintf("%d:%s", e.Code, e.Message)
+}
+
+
+func (h *HttpHandler) FetchExcelData(c echo.Context, sheet string) ([]map[string]string, error) {
+	file, err := c.FormFile("upload")
+	if err != nil {
+		return nil, err
+	}
+	src, err := file.Open()
+	if err != nil {
+		return nil, err
+	}
+	defer src.Close()
+
+	f, err := excelize.OpenReader(src)
+	if err != nil {
+		return nil, err
+	}
+	// Get all cells on Sheet1
+	rows := f.GetRows(sheet)
+	head := make(map[int]string)
+	var data []map[string]string
+	for i, row := range rows {
+		item := make(map[string]string)
+		for k, colCell := range row {
+			if i == 0 {
+				head[k] = colCell
+			} else {
+				item[head[k]] = colCell
+			}
+		}
+		if i == 0 {
+			continue
+		}
+		data = append(data, item)
+	}
+
+	return data, nil
 }

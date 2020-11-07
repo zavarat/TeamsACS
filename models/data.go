@@ -27,7 +27,6 @@ import (
 )
 
 // A generic data CRUD management API with no predefined schema,
-// storing extra data that you may not use at all, but you'll probably use a lot.
 
 // DataManager
 type DataManager struct{ *ModelManager }
@@ -37,23 +36,10 @@ func (m *ModelManager) GetDataManager() *DataManager {
 	return store.(*DataManager)
 }
 
-// QueryDatas
-func (m *DataManager) QueryDatas(params web.RequestParams) (*web.PageResult, error) {
-	collname := params.GetMustString("collname")
-	return m.QueryPagerItems(params, collname)
-}
-
-
-// QueryDatas
-func (m *DataManager) QueryDataOptions(params web.RequestParams) ([]web.JsonOptions, error) {
-	collname := params.GetMustString("collname")
-	return m.QueryItemOptions(params, collname)
-}
-
 
 // GetDataById
 func (m *DataManager) GetData(params web.RequestParams) (*Attributes, error) {
-	_id := params.GetMustString("_id")
+	_id := params.GetParamMap("querymap").GetMustString("_id")
 	collname := params.GetMustString("collname")
 	coll := m.GetTeamsAcsCollection(collname)
 	doc := coll.FindOne(context.TODO(), bson.M{"_id": _id})
@@ -66,6 +52,28 @@ func (m *DataManager) GetData(params web.RequestParams) (*Attributes, error) {
 	return result, err
 }
 
+// GetDataById
+func (m *DataManager) GetDataNameValues(params web.RequestParams) ([]NameValue, error) {
+	_id := params.GetParamMap("querymap").GetMustString("_id")
+	collname := params.GetMustString("collname")
+	coll := m.GetTeamsAcsCollection(collname)
+	doc := coll.FindOne(context.TODO(), bson.M{"_id": _id})
+	err := doc.Err()
+	if err != nil {
+		return nil, err
+	}
+	var nvs = make([]NameValue, 0)
+	var result = new(Attributes)
+	err = doc.Decode(result)
+	for name, value := range *result {
+		nvs = append(nvs, NameValue{
+			Name:  name,
+			Value: value,
+		})
+	}
+	return nvs, err
+}
+
 
 // AddData
 func (m *DataManager) AddData(params web.RequestParams) error {
@@ -76,6 +84,13 @@ func (m *DataManager) AddData(params web.RequestParams) error {
 	}
 	coll := m.GetTeamsAcsCollection(params.GetMustString("collname"))
 	_, err := coll.InsertOne(context.TODO(), data)
+	return err
+}
+
+// AddData
+func (m *DataManager) AddBatchData(collname string, datas []interface{}) error {
+	coll := m.GetTeamsAcsCollection(collname)
+	_, err := coll.InsertMany(context.TODO(), datas)
 	return err
 }
 

@@ -52,9 +52,14 @@ const (
 	GenieacsPresets = "presets"
 )
 
+
+
 type Attributes = map[string]interface{}
 
-
+type NameValue struct {
+	Name string `json:"name"`
+	Value interface{} `json:"value"`
+}
 
 type ModelManager struct {
 	Config       *config.AppConfig

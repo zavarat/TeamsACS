@@ -28,24 +28,6 @@ func (h *HttpHandler) InitAllRouter(e *echo.Echo) {
 	e.Any("/nbi/mikrotik/device/routers", h.QueryMikrotikDeviceRouters)
 	e.Any("/nbi/mikrotik/device/dns", h.QueryMikrotikDeviceDnsClientServer)
 
-	// Cpe apis
-	e.Any("/nbi/cpe/query", h.QueryCpe)
-	e.Any("/nbi/cpe/delete", h.DeleteCpe)
-	e.POST( "/nbi/cpe/add", h.AddCpe)
-	e.POST( "/nbi/cpe/update", h.UpdateCpe)
-
-	// Vpe apis
-	e.Any("/nbi/vpe/query", h.QueryVpe)
-	e.Any("/nbi/vpe/delete", h.DeleteVpe)
-	e.POST( "/nbi/vpe/add", h.AddVpe)
-	e.POST( "/nbi/vpe/update", h.UpdateVpe)
-
-	// Subscribe apis
-	e.Any("/nbi/subscribe/query", h.QuerySubscribe)
-	e.Any("/nbi/subscribe/delete", h.DeleteSubscribe)
-	e.POST("/nbi/subscribe/add",h.AddSubscribe)
-	e.POST("/nbi/subscribe/update", h.UpdateSubscribe)
-
 	// opr apis
 	e.Any("/nbi/opr/query", h.QueryOperator)
 	e.Any("/nbi/opr/delete", h.DeleteOperator)
@@ -56,9 +38,12 @@ func (h *HttpHandler) InitAllRouter(e *echo.Echo) {
 	e.Any("/nbi/data/:collname/query", h.QueryData)
 	e.Any("/nbi/data/:collname/options", h.QueryDataOptions)
 	e.Any("/nbi/data/:collname/get", h.GetData)
+	e.Any("/nbi/data/:collname/itemvalues", h.GetDataValues)
 	e.Any("/nbi/data/:collname/delete", h.DeleteData)
 	e.POST( "/nbi/data/:collname/add",h.AddData)
 	e.POST( "/nbi/data/:collname/update", h.UpdateData)
+	e.POST( "/nbi/data/:collname/import", h.ImportData)
+	e.Any( "/nbi/data/:collname/export", h.ExportData)
 
 	// radius apis
 	e.Any("/nbi/radius/accounting/query", h.QueryRadiusAccounting)

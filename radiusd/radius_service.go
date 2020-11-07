@@ -86,11 +86,11 @@ func (s *RadiusService) GetUser(username string, macauth bool) (*models.Subscrib
 			return nil, err
 		}
 	}
-	if user.Status == common.DISABLED {
+	if user.GetStatus() == common.DISABLED {
 		return nil, fmt.Errorf("user:%s status is disabled", username)
 	}
 
-	if user.ExpireTime.Before(time.Now()) {
+	if user.GetExpireTime().Before(time.Now()) {
 		return nil, fmt.Errorf("user:%s expire", username)
 	}
 	return user, nil
@@ -151,7 +151,7 @@ func GetRadiusOnlineFromRequest(r *radius.Request, vr *radparser.VendorRequest, 
 	return models.Accounting{
 		Username:          rfc2865.UserName_GetString(r.Packet),
 		NasId:             common.IfEmptyStr(rfc2865.NASIdentifier_GetString(r.Packet), common.NA),
-		NasAddr:           vpe.Ipaddr,
+		NasAddr:           vpe.GetIpaddr(),
 		NasPaddr:          nasrip,
 		SessionTimeout:    int(rfc2865.SessionTimeout_Get(r.Packet)),
 		FramedIpaddr:      common.IfEmptyStr(rfc2865.FramedIPAddress_Get(r.Packet).String(), common.NA),
