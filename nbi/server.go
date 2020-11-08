@@ -26,6 +26,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	elog "github.com/labstack/gommon/log"
+	"go.elastic.co/apm/module/apmechov4"
 
 	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/common/log"
@@ -40,7 +41,11 @@ func ListenNBIServer(manager *models.ModelManager) error {
 	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
 		Level: 5,
 	}))
-	e.Use(ServerRecover(manager.Config.NBI.Debug))
+	if os.Getenv("ELASTIC_APM_SERVER_URL") != "" {
+		e.Use(apmechov4.Middleware())
+	} else {
+		e.Use(ServerRecover(manager.Config.NBI.Debug))
+	}
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: "nbi ${time_rfc3339} ${remote_ip} ${method} ${uri} ${protocol} ${status} ${id} ${user_agent} ${latency} ${bytes_in} ${bytes_out} ${error}\n",
 		Output: os.Stdout,

@@ -62,3 +62,8 @@ func (h *HttpHandler) CreateAuthToken(operator *models.Operator) (string, error)
 	}
 	return t, nil
 }
+
+
+func (h *HttpHandler) Status(c echo.Context) error {
+	return c.NoContent(200)
+}

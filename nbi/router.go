@@ -54,7 +54,9 @@ func (h *HttpHandler) InitAllRouter(e *echo.Echo) {
 	e.POST("/nbi/config/radius/update", h.UpdateRadiusConfigs)
 	e.POST("/nbi/config/update", h.UpdateConfig)
 	e.Any("/nbi/config/query", h.QueryConfig)
+	e.Any("/nbi/syslog/query", h.QuerySyslog)
 
 	// token
 	e.POST( "/nbi/token", h.RequestToken)
+	e.Any( "/nbi/status", h.Status)
 }

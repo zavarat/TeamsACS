@@ -20,6 +20,10 @@ import (
 	"context"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
+
 	"github.com/ca17/teamsacs/common/log"
 	"github.com/ca17/teamsacs/common/web"
 )
@@ -42,5 +46,45 @@ func (m *OperatorManager) AddSyslog(item *Syslog)  {
 
 
 func (m *OperatorManager) QuerySyslog(params web.RequestParams) (*web.PageResult, error) {
-	return m.QueryPagerItems(params, TeamsacsSyslog)
+	var findOptions = options.Find()
+	var pos = params.GetInt64WithDefval("start", 0)
+	findOptions.SetSkip(pos)
+	findOptions.SetLimit(params.GetInt64WithDefval("count", 40))
+	coll := m.GetTeamsAcsCollection(TeamsacsSyslog)
+	var q = bson.D{}
+	for qname, val := range params.GetParamMap("filtermap") {
+		if qname == "Message" {
+			_filter := bson.D{{"$regex", primitive.Regex{Pattern: val.(string), Options: "i"}}}
+			q = append(q, bson.E{Key: "attrs."+qname, Value: _filter})
+		} else {
+			q = append(q, bson.E{Key: "attrs."+qname, Value: val})
+		}
+	}
+	for sname, sval := range params.GetParamMap("sortmap") {
+		if sval == "asc" {
+			findOptions.SetSort(bson.D{{"attrs."+sname, 1}})
+		} else if sval == "desc" {
+			findOptions.SetSort(bson.D{{"attrs."+sname, -1}})
+		}
+	}
+	cur, err := coll.Find(context.TODO(), q, findOptions)
+	if err != nil {
+		return nil, err
+	}
+	var countOptions = options.Count()
+	total, err := coll.CountDocuments(context.TODO(), q, countOptions)
+	if err != nil {
+		return nil, err
+	}
+	items := make([]map[string]interface{}, 0)
+	for cur.Next(context.TODO()) {
+		var elem map[string]interface{}
+		err := cur.Decode(&elem)
+		if err != nil {
+			log.Error(err)
+		} else {
+			items = append(items, elem)
+		}
+	}
+	return &web.PageResult{TotalCount: total, Pos: pos, Data: items}, nil
 }

@@ -196,16 +196,16 @@ func LoadConfig(cfile string) *AppConfig {
 	setEnvValue("TEAMSACS_WORKER_DIR", func(v string) {
 		cfg.System.Workdir = v
 	})
-	setEnvValue("TEAMSACS_WEB_HOST", func(v string) {
+	setEnvValue("TEAMSACS_NBI_HOST", func(v string) {
 		cfg.NBI.Host = v
 	})
-	setEnvValue("TEAMSACS_WEB_DEBUG", func(v string) {
+	setEnvValue("TEAMSACS_NBI_DEBUG", func(v string) {
 		cfg.NBI.Debug = v == "true"
 	})
-	setEnvValue("TEAMSACS_WEB_SECRET", func(v string) {
+	setEnvValue("TEAMSACS_NBI_SECRET", func(v string) {
 		cfg.NBI.JwtSecret = v
 	})
-	setEnvInt64Value("TEAMSACS_WEB_PORT", func(v int64) {
+	setEnvInt64Value("TEAMSACS_NBI_PORT", func(v int64) {
 		cfg.NBI.Port = int(v)
 	})
 
@@ -236,8 +236,8 @@ func LoadConfig(cfile string) *AppConfig {
 		cfg.Grpc.Port = int(v)
 	})
 
-	setEnvInt64Value("TEAMSACS_GRPC_DEBUG", func(v int64) {
-		cfg.Grpc.Debug = v == 1
+	setEnvValue("TEAMSACS_GRPC_DEBUG", func(v string) {
+		cfg.Grpc.Debug = v == "true"
 	})
 
 	setEnvInt64Value("TEAMSACS_RADIUS_AUTH_PORT", func(v int64) {
@@ -248,8 +248,8 @@ func LoadConfig(cfile string) *AppConfig {
 		cfg.Radiusd.AcctPort = int(v)
 	})
 
-	setEnvInt64Value("TEAMSACS_RADIUS_DEBUG", func(v int64) {
-		cfg.Radiusd.Debug = v == 1
+	setEnvValue("TEAMSACS_RADIUS_DEBUG", func(v string) {
+		cfg.Radiusd.Debug = v == "true"
 	})
 
 	return cfg

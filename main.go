@@ -22,6 +22,7 @@ import (
 	"os"
 	"runtime"
 	"time"
+	_ "time/tzdata"
 
 	"github.com/op/go-logging"
 	"golang.org/x/sync/errgroup"
@@ -227,14 +228,14 @@ func main() {
 	}
 
 	syslogserv := syslogd.NewSyslogServer(manager)
-	if *startRfc3164 {
+	if *startRfc3164 || os.Getenv("TEAMSACS_RFC3164") == "true" {
 		g.Go(func() error {
 			log.Info("Start rfc3164 Syslog Server ...")
 			return syslogserv.StartRfc3164()
 		})
 	}
 
-	if *startRfc5424 {
+	if *startRfc5424 || os.Getenv("TEAMSACS_RFC5424") == "true"{
 		g.Go(func() error {
 			log.Info("Start rfc5424 Syslog Server ...")
 			return syslogserv.StartRfc5424()
