@@ -56,6 +56,10 @@ func (h *HttpHandler) InitAllRouter(e *echo.Echo) {
 	e.Any("/nbi/config/query", h.QueryConfig)
 	e.Any("/nbi/syslog/query", h.QuerySyslog)
 
+	e.Any("/nbi/cpe/query", h.QueryCpes)
+	e.Any("/nbi/vpe/query", h.QueryVpes)
+	e.Any("/nbi/subscribe/query", h.QuerySubscribes)
+
 	// token
 	e.POST( "/nbi/token", h.RequestToken)
 	e.Any( "/nbi/status", h.Status)

@@ -19,6 +19,7 @@ package models
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -38,16 +39,21 @@ type SubscribeQueryForm struct {
 	Username string `query:"username" form:"username"`
 }
 
-
 func processQueryParams(params web.RequestParams, findOptions *options.FindOptions) bson.D {
 	var q = bson.D{}
 	for qname, val := range params.GetParamMap("filtermap") {
-		if qname == "remark" {
-			_filter := bson.D{{"$regex", primitive.Regex{Pattern: val.(string), Options: "i"}}}
-			q = append(q, bson.E{Key: qname, Value: _filter})
-		} else {
-			q = append(q, bson.E{Key: qname, Value: val})
+		filter := bson.D{{"$regex", primitive.Regex{Pattern: val.(string), Options: "i"}}}
+		q = append(q, bson.E{Key: qname, Value: filter})
+	}
+	for qname, val := range params.GetParamMap("equalmap") {
+		q = append(q, bson.E{Key: qname, Value: val})
+	}
+	for qname, val := range params.GetParamMap("filterinmap") {
+		var varray = bson.A{}
+		for _, v := range strings.Split(val.(string), ",") {
+			varray = append(varray, v)
 		}
+		q = append(q, bson.E{Key: qname, Value: bson.M{"$in": varray}})
 	}
 	for sname, sval := range params.GetParamMap("sortmap") {
 		if sval == "asc" {
@@ -56,6 +62,27 @@ func processQueryParams(params web.RequestParams, findOptions *options.FindOptio
 			findOptions.SetSort(bson.D{{sname, -1}})
 		}
 	}
+
+	timerangemap := params.GetParamMap("timerangemap")
+	_start := timerangemap["start"]
+	startValue := timerangemap["start_value"]
+	_end := timerangemap["end"]
+	endValue := timerangemap["end_value"]
+	switch {
+	case _start != nil && _end != nil && startValue != nil, endValue != nil:
+		timefilterVal := bson.M{"$gte": startValue, "$lte": endValue}
+		timefilter := bson.E{Key: _start.(string), Value: timefilterVal}
+		q = append(q, timefilter)
+	case _start != nil && startValue != nil && (_end == nil || endValue == nil):
+		timefilterVal := bson.M{"$gte": startValue}
+		timefilter := bson.E{Key: _start.(string), Value: timefilterVal}
+		q = append(q, timefilter)
+	case (startValue == nil || _start == nil) && endValue != nil && _end != nil:
+		timefilterVal := bson.M{"lte": endValue}
+		timefilter := bson.E{Key: _end.(string), Value: timefilterVal}
+		q = append(q, timefilter)
+	}
+
 	return q
 }
 
@@ -79,8 +106,6 @@ func (m *ModelManager) QueryItems(params web.RequestParams, collatiion string) (
 	}
 	return &items, nil
 }
-
-
 
 func (m *ModelManager) QueryItemOptions(params web.RequestParams, collatiion string) ([]web.JsonOptions, error) {
 	jsonoptions := make([]web.JsonOptions, 0)

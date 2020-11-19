@@ -30,7 +30,6 @@ import (
 
 // InvokeMikrotikApi
 func (h *HttpHandler) InvokeMikrotikVpeApi(c echo.Context) error {
-	var result = make(map[string]interface{})
 	vpe, err := h.GetManager().GetVpeManager().GetVpeBySn(c.QueryParam("sn"))
 	common.Must(err)
 	apiAddr, err := vpe.GetStringValueWithErr("api_addr")

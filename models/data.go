@@ -19,6 +19,7 @@ package models
 import (
 	"context"
 	"strings"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 
@@ -82,6 +83,7 @@ func (m *DataManager) AddData(params web.RequestParams) error {
 	if common.IsEmptyOrNA(_id) {
 		data["_id"] = common.UUID()
 	}
+	data["update_time"] = time.Now().Format("2006-01-02 15:04:05 Z0700 MST")
 	coll := m.GetTeamsAcsCollection(params.GetMustString("collname"))
 	_, err := coll.InsertOne(context.TODO(), data)
 	return err
@@ -97,6 +99,7 @@ func (m *DataManager) AddBatchData(collname string, datas []interface{}) error {
 // UpdateData
 func (m *DataManager) UpdateData(params web.RequestParams) error {
 	data := params.GetParamMap("data")
+	data["update_time"] = time.Now().Format("2006-01-02 15:04:05 Z0700 MST")
 	_id := data.GetMustString("_id")
 	query := bson.M{"_id": _id}
 	update := bson.M{"$set": data}

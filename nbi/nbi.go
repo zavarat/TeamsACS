@@ -161,6 +161,7 @@ func (h *HttpHandler) JsonBodyParse(c echo.Context) (web.RequestParams, error) {
 func (h *HttpHandler) RequestParseGet(c echo.Context) web.RequestParams {
 	query := make(web.RequestParams)
 	querymap := make(map[string]interface{})
+	equalmap := make(map[string]interface{})
 	filtermap := make(map[string]interface{})
 	sortmap := make(map[string]interface{})
 	for k, vs := range c.QueryParams() {
@@ -168,6 +169,8 @@ func (h *HttpHandler) RequestParseGet(c echo.Context) web.RequestParams {
 			query[k] = vs[0]
 		} else if strings.HasPrefix(k, "filter[") && vs[0] != ""{
 			filtermap[k[7:len(k)-1]] = vs[0]
+		}else if strings.HasPrefix(k, "equal[") && vs[0] != ""{
+			equalmap[k[6:len(k)-1]] = vs[0]
 		} else if strings.HasPrefix(k, "sort[") && vs[0] != ""{
 			sortmap[k[5:len(k)-1]] = vs[0]
 		}else if vs[0] != "" {
@@ -176,6 +179,7 @@ func (h *HttpHandler) RequestParseGet(c echo.Context) web.RequestParams {
 	}
 	query["querymap"] = querymap
 	query["filtermap"] = filtermap
+	query["equalmap"] = equalmap
 	query["sortmap"] = sortmap
 	return query
 }

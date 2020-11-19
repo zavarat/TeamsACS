@@ -47,6 +47,11 @@ func (m *ModelManager) GetVpeManager() *VpeManager {
 }
 
 
+func (m *VpeManager) QueryVpes(params web.RequestParams) (*web.PageResult, error) {
+	return m.QueryPagerItems(params, TeamsacsVpe)
+}
+
+
 // GetVpeByIpaddr
 func (m *VpeManager) GetVpeByIpaddr(ip string) (*Vpe, error) {
 	coll := m.GetTeamsAcsCollection(TeamsacsVpe)

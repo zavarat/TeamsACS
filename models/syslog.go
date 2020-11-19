@@ -20,8 +20,6 @@ import (
 	"context"
 	"time"
 
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/ca17/teamsacs/common/log"
@@ -51,22 +49,7 @@ func (m *OperatorManager) QuerySyslog(params web.RequestParams) (*web.PageResult
 	findOptions.SetSkip(pos)
 	findOptions.SetLimit(params.GetInt64WithDefval("count", 40))
 	coll := m.GetTeamsAcsCollection(TeamsacsSyslog)
-	var q = bson.D{}
-	for qname, val := range params.GetParamMap("filtermap") {
-		if qname == "Message" {
-			_filter := bson.D{{"$regex", primitive.Regex{Pattern: val.(string), Options: "i"}}}
-			q = append(q, bson.E{Key: "attrs."+qname, Value: _filter})
-		} else {
-			q = append(q, bson.E{Key: "attrs."+qname, Value: val})
-		}
-	}
-	for sname, sval := range params.GetParamMap("sortmap") {
-		if sval == "asc" {
-			findOptions.SetSort(bson.D{{"attrs."+sname, 1}})
-		} else if sval == "desc" {
-			findOptions.SetSort(bson.D{{"attrs."+sname, -1}})
-		}
-	}
+	q := processQueryParams(params, findOptions)
 	cur, err := coll.Find(context.TODO(), q, findOptions)
 	if err != nil {
 		return nil, err
