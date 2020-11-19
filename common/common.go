@@ -33,6 +33,7 @@ import (
 	"path"
 	"reflect"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -380,4 +381,65 @@ func UrlJoin(hurl string, elm ...string) string {
 	Must(err)
 	u.Path = path.Join(u.Path, path.Join(elm...))
 	return u.String()
+}
+
+
+
+var notfloat = errors.New("not float value")
+
+func ParseFloat64(v interface{}) (float64,error) {
+	switch v.(type) {
+	case float64:
+		return v.(float64),nil
+	case int64:
+		return float64(v.(int64)),nil
+	case int:
+		return float64(v.(int)),nil
+	case string:
+		fv, err := strconv.ParseFloat(v.(string), 64)
+		if err != nil {
+			return 0, err
+		}
+		return fv, nil
+	}
+	return 0, notfloat
+}
+
+var notint = errors.New("not int value")
+
+func ParseInt64(v interface{}) (int64,error) {
+	switch v.(type) {
+	case float64:
+		return int64(v.(float64)),nil
+	case int64:
+		return v.(int64), nil
+	case int:
+		return int64(v.(int)),nil
+	case string:
+		ival, err := strconv.ParseInt(v.(string), 10,64)
+		if err != nil {
+			return 0, err
+		}
+		return ival, nil
+	}
+	return 0, notint
+}
+
+func ParseString(v interface{}) (string,error) {
+	switch v.(type) {
+	case float64:
+		return strconv.FormatFloat(v.(float64), 'f', 2, 64),nil
+	case int64:
+		return strconv.FormatInt(v.(int64), 10), nil
+	case int:
+		return strconv.Itoa(v.(int)),nil
+	case string:
+		return v.(string), nil
+	case nil:
+		return "", nil
+	case time.Time:
+		return v.(time.Time).Format("2006-01-02 15:04:05"), nil
+	default:
+		return fmt.Sprintf("%v", v), nil
+	}
 }

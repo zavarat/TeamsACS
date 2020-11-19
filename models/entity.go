@@ -17,24 +17,54 @@
 package models
 
 import (
-	"strconv"
+	"fmt"
 	"time"
+
+	"github.com/ca17/teamsacs/common"
 )
 
-type DataObject map[string]string
+type DataObject map[string]interface{}
 
 func (d DataObject) GetStringValue(key string, defval string) string {
 	val, ok := d[key]
-	if !ok || val == "" {
+	if !ok || val == nil || val == "" {
 		return defval
 	}
-	return val
+	val2, err := common.ParseString(val)
+	if err != nil {
+		return defval
+	}
+	return val2
+}
+
+func (d DataObject) GetStringValueWithErr(key string) (string, error) {
+	val, ok := d[key]
+	if !ok || val == nil || val == "" {
+		return "", fmt.Errorf("%s is empty", key)
+	}
+	val2, err := common.ParseString(val)
+	if err != nil {
+		return "", err
+	}
+	return val2, nil
+}
+
+func (d DataObject) GetIntValue(key string, defval int) int {
+	val, ok := d[key]
+	if ok {
+		v, err := common.ParseInt64(val)
+		if err != nil {
+			return defval
+		}
+		return int(v)
+	}
+	return defval
 }
 
 func (d DataObject) GetInt64Value(key string, defval int64) int64 {
 	val, ok := d[key]
 	if ok {
-		v, err := strconv.ParseInt(val, 10, 64)
+		v, err := common.ParseInt64(val)
 		if err != nil {
 			return defval
 		}
@@ -43,10 +73,11 @@ func (d DataObject) GetInt64Value(key string, defval int64) int64 {
 	return defval
 }
 
-func (d DataObject) GetIntValue(key string, defval int) int {
+
+func (d DataObject) GetFloat64Value(key string, defval float64) float64 {
 	val, ok := d[key]
 	if ok {
-		v, err := strconv.Atoi(val)
+		v, err := common.ParseFloat64(val)
 		if err != nil {
 			return defval
 		}
@@ -60,7 +91,10 @@ func (d DataObject) GetDateValue(key string, defval time.Time) time.Time {
 	val, ok := d[key]
 	if ok {
 		var result = defval
-		var err error
+		val, err := common.ParseString(val)
+		if err != nil {
+			return defval
+		}
 		if len(val) == 19 {
 			result, err = time.Parse("2006-01-02 15:04:05", val)
 		}else{

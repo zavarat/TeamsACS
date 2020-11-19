@@ -8,6 +8,7 @@ require (
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-co-op/gocron v0.1.1
+	github.com/go-routeros/routeros v0.0.0-20190905230431-4e69e5fc3b22
 	github.com/golang/protobuf v1.4.2
 	github.com/influxdata/go-syslog/v3 v3.0.0
 	github.com/labstack/echo/v4 v4.1.15

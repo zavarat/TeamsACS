@@ -21,6 +21,8 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 
+	"github.com/ca17/teamsacs/common"
+	"github.com/ca17/teamsacs/common/aes"
 	"github.com/ca17/teamsacs/common/web"
 )
 
@@ -66,4 +68,22 @@ func (m *CpeManager) ExistCpe(sn string) bool {
 	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
 	count, _ := coll.CountDocuments(context.TODO(), bson.M{"sn": sn})
 	return count > 0
+}
+
+
+func (m *CpeManager) AddCpeData(params web.RequestParams) error {
+	data := params.GetParamMap("data")
+	_id := data.GetString("_id")
+	if common.IsEmptyOrNA(_id) {
+		data["_id"] = common.UUID()
+	}
+	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
+	apiPwd := data.GetMustString("api_pwd")
+	var err error
+	data["api_pwd"], err = aes.EncryptToB64(apiPwd, m.Config.System.Aeskey)
+	if err != nil {
+		return err
+	}
+	_, err = coll.InsertOne(context.TODO(), data)
+	return err
 }

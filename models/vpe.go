@@ -20,6 +20,10 @@ import (
 	"context"
 
 	"go.mongodb.org/mongo-driver/bson"
+
+	"github.com/ca17/teamsacs/common"
+	"github.com/ca17/teamsacs/common/aes"
+	"github.com/ca17/teamsacs/common/web"
 )
 
 // Vpe
@@ -67,4 +71,36 @@ func (m *VpeManager) GetVpeByIdentifier(identifier string) (*Vpe, error) {
 	var result = new(Vpe)
 	err = doc.Decode(result)
 	return result, err
+}
+
+
+
+func (m *VpeManager) GetVpeBySn(sn string) (*Cpe, error) {
+	coll := m.GetTeamsAcsCollection(TeamsacsVpe)
+	doc := coll.FindOne(context.TODO(), bson.M{"sn": sn})
+	err := doc.Err()
+	if err != nil {
+		return nil, err
+	}
+	var result = new(Cpe)
+	err = doc.Decode(result)
+	return result, err
+}
+
+
+func (m *VpeManager) AddVpeData(params web.RequestParams) error {
+	data := params.GetParamMap("data")
+	_id := data.GetString("_id")
+	if common.IsEmptyOrNA(_id) {
+		data["_id"] = common.UUID()
+	}
+	coll := m.GetTeamsAcsCollection(TeamsacsVpe)
+	apiPwd := data.GetMustString("api_pwd")
+	var err error
+	data["api_pwd"], err = aes.EncryptToB64(apiPwd, m.Config.System.Aeskey)
+	if err != nil {
+		return err
+	}
+	_, err = coll.InsertOne(context.TODO(), data)
+	return err
 }
