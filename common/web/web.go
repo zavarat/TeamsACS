@@ -16,7 +16,6 @@
 
 package web
 
-
 import (
 	"encoding/json"
 	"errors"
@@ -28,7 +27,6 @@ import (
 
 	"github.com/ca17/teamsacs/common"
 )
-
 
 type DateRange struct {
 	Start string `json:"start"`
@@ -42,11 +40,12 @@ type WebForm struct {
 	Gets     url.Values        `json:"-" form:"-" query:"-"`
 	Params   map[string]string `json:"-" form:"-" query:"-"`
 }
+
 func EmptyWebForm() *WebForm {
 	v := &WebForm{}
-	v.Params = make(map[string]string,0)
-	v.Posts = make(url.Values,0)
-	v.Gets = make(url.Values,0)
+	v.Params = make(map[string]string, 0)
+	v.Posts = make(url.Values, 0)
+	v.Gets = make(url.Values, 0)
 	return v
 }
 
@@ -143,7 +142,6 @@ func (f *WebForm) GetInt64Val(name string, defval int64) int64 {
 	return v
 }
 
-
 type PageResult struct {
 	TotalCount int64       `json:"total_count,omitempty"`
 	Pos        int64       `json:"pos"`
@@ -163,10 +161,13 @@ type JsonOptions struct {
 
 type QueryResult []map[string]interface{}
 
+
+// 通用查询参数
 type RequestParams map[string]interface{}
 
 var EmptyRequestParams = make(RequestParams)
 
+// 获取单个字符串
 func (jp RequestParams) GetString(key string) string {
 	v, ok := jp[key]
 	if !ok {
@@ -179,6 +180,7 @@ func (jp RequestParams) GetString(key string) string {
 	return ""
 }
 
+// 获取子查询
 func (jp RequestParams) GetParamMap(key string) RequestParams {
 	v, ok := jp[key]
 	if !ok {
@@ -210,7 +212,7 @@ func (jp RequestParams) GetInt64(key string) int64 {
 	}
 	switch v.(type) {
 	case int64:
-		return  v.(int64)
+		return v.(int64)
 	case string:
 		vvv, err := strconv.ParseInt(v.(string), 10, 64)
 		if err != nil {
@@ -228,7 +230,7 @@ func (jp RequestParams) GetInt64WithDefval(key string, devfval int64) int64 {
 	}
 	switch v.(type) {
 	case int64:
-		return  v.(int64)
+		return v.(int64)
 	case string:
 		vvv, err := strconv.ParseInt(v.(string), 10, 64)
 		if err != nil {
@@ -244,11 +246,11 @@ var NoValueError = fmt.Errorf("no value")
 func (jp RequestParams) GetMustString(key string) string {
 	v, ok := jp[key]
 	if !ok {
-		common.Must(fmt.Errorf(key+" attr no value"))
+		common.Must(fmt.Errorf(key + " attr no value"))
 	}
 	vv, ok := v.(string)
 	if !ok {
-		common.Must(fmt.Errorf(key+" attr not string"))
+		common.Must(fmt.Errorf(key + " attr not string"))
 	}
 	return vv
 }
@@ -256,7 +258,7 @@ func (jp RequestParams) GetMustString(key string) string {
 func (jp RequestParams) GetMustInt64(key string) int64 {
 	v, ok := jp[key]
 	if !ok {
-		common.Must(fmt.Errorf(key+" attr not int64"))
+		common.Must(fmt.Errorf(key + " attr not int64"))
 	}
 	vv, ok := v.(int64)
 	if !ok {
@@ -265,3 +267,31 @@ func (jp RequestParams) GetMustInt64(key string) int64 {
 	return vv
 }
 
+func (jp RequestParams) GetQueryMap() RequestParams {
+	return jp.GetParamMap("querymap")
+}
+
+func (jp RequestParams) GetFilterMap() RequestParams {
+	return jp.GetParamMap("filtermap")
+}
+
+func (jp RequestParams) GetFilterInMap() RequestParams {
+	return jp.GetParamMap("filterinmap")
+}
+
+func (jp RequestParams) GetEqualMap() RequestParams {
+	return jp.GetParamMap("equalmap")
+}
+
+func (jp RequestParams) GetTimeRangeMap() RequestParams {
+	return jp.GetParamMap("timerangemap")
+}
+
+func (jp RequestParams) GetSortMap() RequestParams {
+	return jp.GetParamMap("sortmap")
+}
+
+func (jp RequestParams) ToJson() string {
+	bs, _ := json.MarshalIndent(jp, "", "\t")
+	return string(bs)
+}

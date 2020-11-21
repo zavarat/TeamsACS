@@ -18,6 +18,7 @@ package models
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -37,6 +38,11 @@ type QueryForm struct {
 type SubscribeQueryForm struct {
 	QueryForm
 	Username string `query:"username" form:"username"`
+}
+
+func logQueryParams(q interface{}) {
+	bs, _ := json.MarshalIndent(q, "", "\t")
+	log.Info(string(bs))
 }
 
 func processQueryParams(params web.RequestParams, findOptions *options.FindOptions) bson.D {
@@ -69,7 +75,7 @@ func processQueryParams(params web.RequestParams, findOptions *options.FindOptio
 	_end := timerangemap["end"]
 	endValue := timerangemap["end_value"]
 	switch {
-	case _start != nil && _end != nil && startValue != nil, endValue != nil:
+	case _start != nil && _end != nil && startValue != nil && endValue != nil:
 		timefilterVal := bson.M{"$gte": startValue, "$lte": endValue}
 		timefilter := bson.E{Key: _start.(string), Value: timefilterVal}
 		q = append(q, timefilter)
@@ -78,7 +84,7 @@ func processQueryParams(params web.RequestParams, findOptions *options.FindOptio
 		timefilter := bson.E{Key: _start.(string), Value: timefilterVal}
 		q = append(q, timefilter)
 	case (startValue == nil || _start == nil) && endValue != nil && _end != nil:
-		timefilterVal := bson.M{"lte": endValue}
+		timefilterVal := bson.M{"$lte": endValue}
 		timefilter := bson.E{Key: _end.(string), Value: timefilterVal}
 		q = append(q, timefilter)
 	}
@@ -90,6 +96,7 @@ func (m *ModelManager) QueryItems(params web.RequestParams, collatiion string) (
 	var findOptions = options.Find()
 	coll := m.GetTeamsAcsCollection(collatiion)
 	q := processQueryParams(params, findOptions)
+	logQueryParams(q)
 	cur, err := coll.Find(context.TODO(), q, findOptions)
 	if err != nil {
 		return nil, err
@@ -120,7 +127,7 @@ func (m *ModelManager) QueryItemOptions(params web.RequestParams, collatiion str
 	for qname, val := range params.GetParamMap("filtermap") {
 		q = append(q, bson.E{Key: qname, Value: val})
 	}
-
+	logQueryParams(q)
 	cur, err := coll.Find(context.TODO(), q, findOptions)
 	if err != nil {
 		return nil, err
@@ -152,6 +159,7 @@ func (m *ModelManager) QueryPagerItems(params web.RequestParams, collatiion stri
 	findOptions.SetLimit(params.GetInt64WithDefval("count", 40))
 	coll := m.GetTeamsAcsCollection(collatiion)
 	q := processQueryParams(params, findOptions)
+	logQueryParams(q)
 	cur, err := coll.Find(context.TODO(), q, findOptions)
 	if err != nil {
 		return nil, err

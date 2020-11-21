@@ -28,7 +28,7 @@ import (
 )
 
 func (h *HttpHandler) RequestToken(c echo.Context) error {
-	params, err := h.JsonBodyParse(c)
+	params, err := h.ParseJsonBody(c)
 	common.Must(err)
 	username := params.GetMustString("username")
 	apisecret := params.GetMustString("apisecret")

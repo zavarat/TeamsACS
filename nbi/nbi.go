@@ -148,7 +148,8 @@ func (h *HttpHandler) GetUserId(c echo.Context) string {
 	return uid.(string)
 }
 
-func (h *HttpHandler) JsonBodyParse(c echo.Context) (web.RequestParams, error) {
+// 解析 JSON  POST 参数
+func (h *HttpHandler) ParseJsonBody(c echo.Context) (web.RequestParams, error) {
 	body, err := ioutil.ReadAll(c.Request().Body)
 	if err != nil {
 		return nil, err
@@ -158,32 +159,57 @@ func (h *HttpHandler) JsonBodyParse(c echo.Context) (web.RequestParams, error) {
 	return query, err
 }
 
+
+// 解析查询参数
 func (h *HttpHandler) RequestParseGet(c echo.Context) web.RequestParams {
 	query := make(web.RequestParams)
 	querymap := make(map[string]interface{})
-	equalmap := make(map[string]interface{})
 	filtermap := make(map[string]interface{})
+	filterinmap := make(map[string]interface{})
+	equalmap := make(map[string]interface{})
+	timerangemap := make(map[string]interface{})
 	sortmap := make(map[string]interface{})
 	for k, vs := range c.QueryParams() {
-		if common.InSlice(k, []string{"start", "count"}){
+		switch  {
+		case common.InSlice(k, []string{"start", "count"}):
+			// 分页参数
 			query[k] = vs[0]
-		} else if strings.HasPrefix(k, "filter[") && vs[0] != ""{
+		case strings.HasPrefix(k, "filter[") && vs[0] != "":
+			// 模糊查询参数
 			filtermap[k[7:len(k)-1]] = vs[0]
-		}else if strings.HasPrefix(k, "equal[") && vs[0] != ""{
+		case strings.HasPrefix(k, "timerange_start[") && vs[0] != "":
+			// 时间范围起始参数
+			timerangemap["start"] = k[16:len(k)-1]
+			timerangemap["start_value"] = vs[0]
+		case strings.HasPrefix(k, "timerange_end[") && vs[0] != "":
+			// 时间范围结束参数
+			timerangemap["end"] = k[14:len(k)-1]
+			timerangemap["end_value"] = vs[0]
+		case strings.HasPrefix(k, "equal[") && vs[0] != "":
+			// 全部匹配参数
 			equalmap[k[6:len(k)-1]] = vs[0]
-		} else if strings.HasPrefix(k, "sort[") && vs[0] != ""{
+		case strings.HasPrefix(k, "filter_in[") && vs[0] != "":
+			// 包含匹配参数
+			filterinmap[k[10:len(k)-1]] = vs[0]
+		case strings.HasPrefix(k, "sort[") && vs[0] != "":
+			// 排序参数
 			sortmap[k[5:len(k)-1]] = vs[0]
-		}else if vs[0] != "" {
+		case vs[0] != "":
+			// 其他参数
 			querymap[k] = vs[0]
 		}
 	}
 	query["querymap"] = querymap
 	query["filtermap"] = filtermap
+	query["filterinmap"] = filterinmap
 	query["equalmap"] = equalmap
+	query["timerangemap"] = timerangemap
 	query["sortmap"] = sortmap
 	return query
 }
 
+
+// 解析表单提交参数
 func (h *HttpHandler) RequestParseForm(c echo.Context) web.RequestParams {
 	params := make(web.RequestParams)
 	data := make(map[string]interface{})
@@ -204,7 +230,7 @@ func (h *HttpHandler) RequestParse(c echo.Context) web.RequestParams {
 	case http.MethodPost, http.MethodPut:
 		ctype := c.Request().Header.Get("Content-Type")
 		if ctype == "application/json" {
-			params, err = h.JsonBodyParse(c)
+			params, err = h.ParseJsonBody(c)
 			common.Must(err)
 		}else if ctype == "application/x-www-form-urlencoded" {
 			params = h.RequestParseForm(c)

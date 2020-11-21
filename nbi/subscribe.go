@@ -18,17 +18,25 @@ package nbi
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
+
+	"github.com/ca17/teamsacs/common"
 )
 
 func (h *HttpHandler) QuerySubscribes(c echo.Context) error {
 	params := h.RequestParse(c)
-	params.GetParamMap("sortmap")["update_time"] = "desc"
-	data, err := h.GetManager().GetSubscribeManager().QuerySubscribes(params)
-	if err != nil {
-		return h.GetInternalError(err)
+	params.GetSortMap()["update_time"] = "desc"
+	// 查询即将过期的帐号
+	expireDays := params.GetQueryMap().GetInt64("expire_days")
+	if expireDays > 0 {
+		trmap := params.GetTimeRangeMap()
+		trmap["end"] = "expire_time"
+		trmap["end_value"] = time.Now().Add(time.Hour * 24 * time.Duration(expireDays)).Format("2006-01-02 15:04:05")
 	}
+	data, err := h.GetManager().GetSubscribeManager().QuerySubscribes(params)
+	common.Must(err)
 	return c.JSON(http.StatusOK, data)
 }
 
